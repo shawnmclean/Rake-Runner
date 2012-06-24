@@ -1,9 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RakeRunner", "src\RakeRunner.csproj", "{54C786E5-FD14-4036-92AE-E9F25B71534B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RakeRunner.Tests", "tests\RakeRunner.Tests.csproj", "{6D130796-1F30-4E89-9524-6E79E9B8D847}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestProject2", "tests\RakeRunner.Tests.csproj", "{6D130796-1F30-4E89-9524-6E79E9B8D847}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{F2D3D681-E597-43CC-A807-98E62074D8E1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{DD25C706-3B44-42C1-96CB-D6BA641F1288}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RakeRunner.VsExtension", "src\RakeRunner.VsExtension\RakeRunner.VsExtension.csproj", "{135E5F76-2880-48D4-9DAD-EB9363D3E356}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RakeRunner.Library", "src\RakeRunner.Library\RakeRunner.Library.csproj", "{AEB5DB56-A141-4395-96AB-769646994ACE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,16 +17,25 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{54C786E5-FD14-4036-92AE-E9F25B71534B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{54C786E5-FD14-4036-92AE-E9F25B71534B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{54C786E5-FD14-4036-92AE-E9F25B71534B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{54C786E5-FD14-4036-92AE-E9F25B71534B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{135E5F76-2880-48D4-9DAD-EB9363D3E356}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{135E5F76-2880-48D4-9DAD-EB9363D3E356}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{135E5F76-2880-48D4-9DAD-EB9363D3E356}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{135E5F76-2880-48D4-9DAD-EB9363D3E356}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6D130796-1F30-4E89-9524-6E79E9B8D847}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6D130796-1F30-4E89-9524-6E79E9B8D847}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6D130796-1F30-4E89-9524-6E79E9B8D847}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6D130796-1F30-4E89-9524-6E79E9B8D847}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AEB5DB56-A141-4395-96AB-769646994ACE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AEB5DB56-A141-4395-96AB-769646994ACE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AEB5DB56-A141-4395-96AB-769646994ACE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AEB5DB56-A141-4395-96AB-769646994ACE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{135E5F76-2880-48D4-9DAD-EB9363D3E356} = {F2D3D681-E597-43CC-A807-98E62074D8E1}
+		{6D130796-1F30-4E89-9524-6E79E9B8D847} = {DD25C706-3B44-42C1-96CB-D6BA641F1288}
+		{AEB5DB56-A141-4395-96AB-769646994ACE} = {F2D3D681-E597-43CC-A807-98E62074D8E1}
 	EndGlobalSection
 EndGlobal

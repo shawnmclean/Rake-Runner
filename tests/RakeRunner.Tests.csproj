@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>8ff76ac5-8870-4dfb-8f69-40115a279ffb</ProjectGuid>
+    <ProjectGuid>{6D130796-1F30-4E89-9524-6E79E9B8D847}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>RakeRunner.Tests</RootNamespace>
