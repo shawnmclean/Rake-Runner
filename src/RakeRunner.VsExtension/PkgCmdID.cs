@@ -6,9 +6,8 @@ namespace Company.RakeRunner_VsExtension
 {
     static class PkgCmdIDList
     {
-        public const uint runRakeTaskCommandId = 0x100;
-        public const uint editRakeTaskCommandId = 0x200;
-
+        public const uint icmdCommandAbout = 0x500;
+        public const uint icmdCommandEditRake = 0x501;
 
 
     };

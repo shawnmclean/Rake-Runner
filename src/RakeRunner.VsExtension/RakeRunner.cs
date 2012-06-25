@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.ComponentModel.Design;
+using System.Windows.Forms;
 using Microsoft.Win32;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -63,12 +64,18 @@ namespace Company.RakeRunner_VsExtension
             OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
             if ( null != mcs )
             {
-                // Create the command for the menu item.
-                CommandID menuCommandID = new CommandID(GuidList.guidRakeRunnerCmdSet, (int)PkgCmdIDList.runRakeTaskCommandId);
-                MenuCommand menuItem = new MenuCommand(MenuItemCallback, menuCommandID );
-                mcs.AddCommand( menuItem );
+                // Show About dialog
+                CommandID menuCommandAboutId = new CommandID(GuidList.guidRakeRunnerCmdSet, (int)PkgCmdIDList.icmdCommandAbout);
+                MenuCommand menuAbout = new MenuCommand(menuAboutClicked, menuCommandAboutId);
+                mcs.AddCommand(menuAbout);
             }
         }
+
+        private void menuAboutClicked(object sender, EventArgs eventArgs)
+        {
+            MessageBox.Show("LOL");
+        }
+
         #endregion
 
         /// <summary>
