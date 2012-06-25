@@ -53,6 +53,16 @@
     <Compile Include="UnitTest1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\src\RakeRunner.Library\RakeRunner.Library.csproj">
+      <Project>{aeb5db56-a141-4395-96ab-769646994ace}</Project>
+      <Name>RakeRunner.Library</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\src\RakeRunner.VsExtension\RakeRunner.VsExtension.csproj">
+      <Project>{135e5f76-2880-48d4-9dad-eb9363d3e356}</Project>
+      <Name>RakeRunner.VsExtension</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

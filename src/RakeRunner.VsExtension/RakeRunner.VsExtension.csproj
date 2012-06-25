@@ -14,8 +14,8 @@
     <ProjectTypeGuids>{82b43b9b-a64c-4715-b499-d71e9ca2bd60};{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Company.RakeRunner_VsExtension</RootNamespace>
-    <AssemblyName>RakeRunner.VsExtension</AssemblyName>
+    <RootNamespace>RakeRunner.VsExtension</RootNamespace>
+    <AssemblyName>RakeRunner</AssemblyName>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>Key.snk</AssemblyOriginatorKeyFile>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
@@ -158,6 +158,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\Package.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RakeRunner.Library\RakeRunner.Library.csproj">
+      <Project>{aeb5db56-a141-4395-96ab-769646994ace}</Project>
+      <Name>RakeRunner.Library</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>
