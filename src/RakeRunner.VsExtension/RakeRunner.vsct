@@ -68,7 +68,7 @@
           <ButtonText>Edit Rakefile...</ButtonText>
         </Strings>
       </Button>
-    
+
       <Button guid="guidRakeRunnerCmdSet" id="icmdCommandAbout" priority="0x0001" type="Button">
         <Parent guid="guidRakeRunnerCmdSet" id="igrpRakeCommands"/>
         <Strings>
@@ -76,7 +76,7 @@
         </Strings>
       </Button>
     </Buttons>
-    
+
 
     <!--The bitmaps section is used to define the bitmaps that are used for the commands.-->
     <Bitmaps>
@@ -121,11 +121,9 @@
 
       <IDSymbol name="imnuRakeMenu" value="0x205" />
       <IDSymbol name="igrpRakeCommands" value="0x301"/>
-      
-      
+
       <IDSymbol name="igrpRakeTasks" value="0x400"/>
-      
-    
+
       <IDSymbol name="icmdCommandAbout" value="0x500"/>
       <IDSymbol name="icmdCommandEditRake" value="0x501"/>
 
