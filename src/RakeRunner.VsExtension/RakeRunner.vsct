@@ -43,9 +43,6 @@
       <Group guid="guidRakeRunnerCmdSet" id="igrpRakeCommands" priority="0x0000">
         <Parent guid="guidRakeRunnerCmdSet" id="imnuRakeMenu"/>
       </Group>
-      <Group guid="guidRakeRunnerCmdSet" id="igrpRakeTasks" priority="0x0001">
-        <Parent guid="guidRakeRunnerCmdSet" id="imnuRakeMenu"/>
-      </Group>
     </Groups>
 
     <Menus>
@@ -55,7 +52,6 @@
           <CommandName>Rake</CommandName>
         </Strings>
       </Menu>
-
     </Menus>
 
     <!--Buttons section. -->
