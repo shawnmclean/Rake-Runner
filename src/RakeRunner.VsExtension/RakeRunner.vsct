@@ -34,45 +34,42 @@
     group; your package should define its own command set in order to avoid collisions  
     with command ids defined by other packages. -->
 
-    
+
     <!-- In this section you can define new menu groups. A menu group is a container for 
          other menus or buttons (commands); from a visual point of view you can see the 
          group as the part of a menu contained between two lines. The parent of a group 
          must be a menu. -->
     <Groups>
-
-      <Group guid="guidRakeRunnerCmdSet" id="MyMenuGroup" priority="0x0600">
-        <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_TOOLS"/>
+      <Group guid="guidRakeRunnerCmdSet" id="igrpRakeCommands" priority="0x0000">
+        <Parent guid="guidRakeRunnerCmdSet" id="imnuRakeMenu"/>
       </Group>
-      
-
-
+      <Group guid="guidRakeRunnerCmdSet" id="igrpRakeTasks" priority="0x0001">
+        <Parent guid="guidRakeRunnerCmdSet" id="imnuRakeMenu"/>
+      </Group>
     </Groups>
-    
+
+    <Menus>
+      <Menu guid="guidRakeRunnerCmdSet" id="imnuRakeMenu" priority="0x0000" type="Menu">
+        <Strings>
+          <ButtonText>Rake</ButtonText>
+          <CommandName>Rake</CommandName>
+        </Strings>
+      </Menu>
+
+    </Menus>
+
     <!--Buttons section. -->
     <!--This section defines the elements the user can interact with, like a menu command or a button 
         or combo box in a toolbar. -->
     <Buttons>
-      <!--To define a menu group you have to specify its ID, the parent menu and its display priority. 
-          The command is visible and enabled by default. If you need to change the visibility, status, etc, you can use
-          the CommandFlag node.
-          You can add more than one CommandFlag node e.g.:
-              <CommandFlag>DefaultInvisible</CommandFlag>
-              <CommandFlag>DynamicVisibility</CommandFlag>
-          If you do not want an image next to your command, remove the Icon node /> -->
-
-      <Button guid="guidRakeRunnerCmdSet" id="runRakeTaskCommandId" priority="0x0100" type="Button">
-        <Parent guid="guidRakeRunnerCmdSet" id="MyMenuGroup" />
-        <Icon guid="guidImages" id="bmpPic1" />
+      <Button guid="guidRakeRunnerCmdSet" id="icmdCommandEditRake" priority="0x0000" type="Button">
+        <Parent guid="guidRakeRunnerCmdSet" id="igrpRakeCommands"/>
         <Strings>
-          <ButtonText>Run Rake Tasks</ButtonText>
+          <ButtonText>Edit Rakefile...</ButtonText>
         </Strings>
       </Button>
-
-
-
     </Buttons>
-   
+
     <!--The bitmaps section is used to define the bitmaps that are used for the commands.-->
     <Bitmaps>
       <!--  The bitmap id is defined in a way that is a little bit different from the others: 
@@ -81,28 +78,49 @@
             inside a button definition. An important aspect of this declaration is that the element id 
             must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
       <Bitmap guid="guidImages" href="Resources\Images.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows"/>
-      
+
     </Bitmaps>
- 
+
   </Commands>
 
 
+  <CommandPlacements>
+    <CommandPlacement guid="guidRakeRunnerCmdSet" id="imnuRakeMenu" priority="0x7000">
+      <Parent guid="guidSHLMainMenu" id="IDG_VS_CTXT_SOLUTION_BUILD"/>
+    </CommandPlacement>
+    <CommandPlacement guid="guidRakeRunnerCmdSet" id="imnuRakeMenu" priority="0x7000">
+      <Parent guid="guidSHLMainMenu" id="IDG_VS_BUILD_SOLUTION"/>
+    </CommandPlacement>
+    <CommandPlacement guid="guidRakeRunnerCmdSet" id="imnuRakeMenu" priority="0x7000">
+      <Parent guid="guidSHLMainMenu" id="IDG_VS_CTXT_SLNFLDR_BUILD"/>
+    </CommandPlacement>
+    <CommandPlacement guid="guidRakeRunnerCmdSet" id="imnuRakeMenu" priority="0x7000">
+      <Parent guid="guidSHLMainMenu" id="IDG_VS_CTXT_PROJECT_BUILD"/>
+    </CommandPlacement>
+
+
+
+  </CommandPlacements>
 
 
 
   <Symbols>
     <!-- This is the package guid. -->
     <GuidSymbol name="guidRakeRunnerPkg" value="{250f7ad3-190d-489e-b8f9-9a0604c2ac72}" />
-    
+
     <!-- This is the guid used to group the menu commands together -->
     <GuidSymbol name="guidRakeRunnerCmdSet" value="{c78d067c-81eb-42ee-b3c6-5ad5ebec72ae}">
 
-      <IDSymbol name="MyMenuGroup" value="0x1020" />
-      <IDSymbol name="runRakeTaskCommandId" value="0x0100" />
+      <IDSymbol name="imnuRakeMenu" value="0x205" />
+      <IDSymbol name="igrpRakeCommands" value="0x301"/>
+      
+      <IDSymbol name="icmdCommandEditRake" value="0x200"/>
+      
+    
+
     </GuidSymbol>
-    
-    
-    
+
+
     <GuidSymbol name="guidImages" value="{6f53c581-b13b-4e33-b900-f875c0519cc9}" >
       <IDSymbol name="bmpPic1" value="1" />
       <IDSymbol name="bmpPic2" value="2" />
