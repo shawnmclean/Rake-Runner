@@ -82,7 +82,6 @@
             inside a button definition. An important aspect of this declaration is that the element id 
             must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
       <Bitmap guid="guidImages" href="Resources\Images.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows"/>
-
     </Bitmaps>
 
   </Commands>
@@ -101,13 +100,9 @@
     <CommandPlacement guid="guidRakeRunnerCmdSet" id="imnuRakeMenu" priority="0x7000">
       <Parent guid="guidSHLMainMenu" id="IDG_VS_CTXT_PROJECT_BUILD"/>
     </CommandPlacement>
-
-
-
   </CommandPlacements>
-
-
-
+    
+    
   <Symbols>
     <!-- This is the package guid. -->
     <GuidSymbol name="guidRakeRunnerPkg" value="{250f7ad3-190d-489e-b8f9-9a0604c2ac72}" />
