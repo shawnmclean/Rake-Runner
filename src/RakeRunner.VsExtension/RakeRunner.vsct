@@ -39,12 +39,13 @@
          must be a menu. -->
     <Groups>
       <Group guid="guidRakeRunnerCmdSet" id="igrpRakeCommands" priority="0x0000">
-        <Parent guid="guidRakeRunnerCmdSet" id="imnuRakeMenu"/>
+        <Parent guid="guidRakeRunnerCmdSet" id="icmdCommandRakeMenu"/>
       </Group>
     </Groups>
 
     <Menus>
-      <Menu guid="guidRakeRunnerCmdSet" id="imnuRakeMenu" priority="0x0000" type="Menu">
+      <Menu guid="guidRakeRunnerCmdSet" id="icmdCommandRakeMenu" priority="0x0000" type="Menu">
+        <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <ButtonText>Rake</ButtonText>
           <CommandName>Rake</CommandName>
@@ -86,16 +87,16 @@
 
 
   <CommandPlacements>
-    <CommandPlacement guid="guidRakeRunnerCmdSet" id="imnuRakeMenu" priority="0x7000">
+    <CommandPlacement guid="guidRakeRunnerCmdSet" id="icmdCommandRakeMenu" priority="0x7000">
       <Parent guid="guidSHLMainMenu" id="IDG_VS_CTXT_SOLUTION_BUILD"/>
     </CommandPlacement>
-    <CommandPlacement guid="guidRakeRunnerCmdSet" id="imnuRakeMenu" priority="0x7000">
+    <CommandPlacement guid="guidRakeRunnerCmdSet" id="icmdCommandRakeMenu" priority="0x7000">
       <Parent guid="guidSHLMainMenu" id="IDG_VS_BUILD_SOLUTION"/>
     </CommandPlacement>
-    <CommandPlacement guid="guidRakeRunnerCmdSet" id="imnuRakeMenu" priority="0x7000">
+    <CommandPlacement guid="guidRakeRunnerCmdSet" id="icmdCommandRakeMenu" priority="0x7000">
       <Parent guid="guidSHLMainMenu" id="IDG_VS_CTXT_SLNFLDR_BUILD"/>
     </CommandPlacement>
-    <CommandPlacement guid="guidRakeRunnerCmdSet" id="imnuRakeMenu" priority="0x7000">
+    <CommandPlacement guid="guidRakeRunnerCmdSet" id="icmdCommandRakeMenu" priority="0x7000">
       <Parent guid="guidSHLMainMenu" id="IDG_VS_CTXT_PROJECT_BUILD"/>
     </CommandPlacement>
   </CommandPlacements>
@@ -108,13 +109,13 @@
     <!-- This is the guid used to group the menu commands together -->
     <GuidSymbol name="guidRakeRunnerCmdSet" value="{c78d067c-81eb-42ee-b3c6-5ad5ebec72ae}">
 
-      <IDSymbol name="imnuRakeMenu" value="0x205" />
+      <IDSymbol name="icmdCommandRakeMenu" value="0x500" />
       <IDSymbol name="igrpRakeCommands" value="0x301"/>
 
       <IDSymbol name="igrpRakeTasks" value="0x400"/>
 
-      <IDSymbol name="icmdCommandAbout" value="0x500"/>
-      <IDSymbol name="icmdCommandEditRake" value="0x501"/>
+      <IDSymbol name="icmdCommandAbout" value="0x501"/>
+      <IDSymbol name="icmdCommandEditRake" value="0x502"/>
 
     </GuidSymbol>
 

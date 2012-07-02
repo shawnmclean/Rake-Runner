@@ -64,11 +64,55 @@ namespace Company.RakeRunner_VsExtension
             OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
             if ( null != mcs )
             {
+                //the main menu
+                CommandID menuCommandMainMenuId = new CommandID(GuidList.guidRakeRunnerCmdSet, (int)PkgCmdIDList.icmdCommandRakeMenu);
+                OleMenuCommand menuMain = new OleMenuCommand(menuAboutClicked, menuCommandMainMenuId);
+                menuMain.BeforeQueryStatus += menuMain_BeforeQueryStatus;
+                mcs.AddCommand(menuMain);
+
                 // Show About dialog
                 CommandID menuCommandAboutId = new CommandID(GuidList.guidRakeRunnerCmdSet, (int)PkgCmdIDList.icmdCommandAbout);
                 MenuCommand menuAbout = new MenuCommand(menuAboutClicked, menuCommandAboutId);
                 mcs.AddCommand(menuAbout);
             }
+        }
+
+        void menuMain_BeforeQueryStatus(object sender, EventArgs e)
+        {
+                OleMenuCommand menuCommand = sender as OleMenuCommand;
+                if (menuCommand != null)
+                {
+                    var dte = (EnvDTE.DTE) Package.GetGlobalService(typeof (SDTE));
+                    string directory;
+                    //get the solution directory
+                    if (dte.Solution != null)
+                        directory = System.IO.Path.GetDirectoryName(dte.Solution.FullName);
+
+                    IntPtr hierarchyPtr, selectionContainerPtr;
+                    uint projectItemId;
+                    IVsMultiItemSelect mis;
+                    IVsMonitorSelection monitorSelection =
+                        (IVsMonitorSelection) Package.GetGlobalService(typeof (SVsShellMonitorSelection));
+                    monitorSelection.GetCurrentSelection(out hierarchyPtr, out projectItemId, out mis,
+                                                         out selectionContainerPtr);
+
+                    IVsHierarchy hierarchy =
+                        Marshal.GetTypedObjectForIUnknown(hierarchyPtr, typeof (IVsHierarchy)) as IVsHierarchy;
+                    if (hierarchy != null)
+                    {
+                        object value;
+                        hierarchy.GetProperty(projectItemId, (int) __VSHPROPID.VSHPROPID_Name, out value);
+
+                        if (value != null && value.ToString().EndsWith(".dbml"))
+                        {
+                            menuCommand.Visible = true;
+                        }
+                        else
+                        {
+                            menuCommand.Visible = false;
+                        }
+                    }
+                }
         }
 
         private void menuAboutClicked(object sender, EventArgs eventArgs)
