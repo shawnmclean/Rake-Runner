@@ -9,6 +9,8 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
+using RakeRunner.Library.Exceptions;
+using RakeRunner.Library.Services;
 
 namespace Company.RakeRunner_VsExtension
 {
@@ -83,35 +85,48 @@ namespace Company.RakeRunner_VsExtension
                 if (menuCommand != null)
                 {
                     var dte = (EnvDTE.DTE) Package.GetGlobalService(typeof (SDTE));
-                    string directory;
+                    string directory = "";
                     //get the solution directory
                     if (dte.Solution != null)
                         directory = System.IO.Path.GetDirectoryName(dte.Solution.FullName);
 
-                    IntPtr hierarchyPtr, selectionContainerPtr;
-                    uint projectItemId;
-                    IVsMultiItemSelect mis;
-                    IVsMonitorSelection monitorSelection =
-                        (IVsMonitorSelection) Package.GetGlobalService(typeof (SVsShellMonitorSelection));
-                    monitorSelection.GetCurrentSelection(out hierarchyPtr, out projectItemId, out mis,
-                                                         out selectionContainerPtr);
-
-                    IVsHierarchy hierarchy =
-                        Marshal.GetTypedObjectForIUnknown(hierarchyPtr, typeof (IVsHierarchy)) as IVsHierarchy;
-                    if (hierarchy != null)
+                    RakeService service = new RakeService();
+                    try
                     {
-                        object value;
-                        hierarchy.GetProperty(projectItemId, (int) __VSHPROPID.VSHPROPID_Name, out value);
-
-                        if (value != null && value.ToString().EndsWith(".dbml"))
-                        {
-                            menuCommand.Visible = true;
-                        }
-                        else
-                        {
-                            menuCommand.Visible = false;
-                        }
+                        var tasks = service.GetRakeTasks(directory);
+                        menuCommand.Visible = true;
                     }
+                    catch(RakeFailedException rfe)
+                    {
+                        //if there is an exception in getting rake tasks, dont show the menu
+                        menuCommand.Visible = false;
+                    }
+
+
+                    //IntPtr hierarchyPtr, selectionContainerPtr;
+                    //uint projectItemId;
+                    //IVsMultiItemSelect mis;
+                    //IVsMonitorSelection monitorSelection =
+                    //    (IVsMonitorSelection) Package.GetGlobalService(typeof (SVsShellMonitorSelection));
+                    //monitorSelection.GetCurrentSelection(out hierarchyPtr, out projectItemId, out mis,
+                    //                                     out selectionContainerPtr);
+
+                    //IVsHierarchy hierarchy =
+                    //    Marshal.GetTypedObjectForIUnknown(hierarchyPtr, typeof (IVsHierarchy)) as IVsHierarchy;
+                    //if (hierarchy != null)
+                    //{
+                    //    object value;
+                    //    hierarchy.GetProperty(projectItemId, (int) __VSHPROPID.VSHPROPID_Name, out value);
+
+                    //    if (value != null && value.ToString().EndsWith(".dbml"))
+                    //    {
+                    //        menuCommand.Visible = true;
+                    //    }
+                    //    else
+                    //    {
+                    //        menuCommand.Visible = false;
+                    //    }
+                    //}
                 }
         }
 
