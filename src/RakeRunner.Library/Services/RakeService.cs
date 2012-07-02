@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using RakeRunner.Library.Exceptions;
 using RakeRunner.Library.Models;
 
 namespace RakeRunner.Library.Services
@@ -24,10 +25,12 @@ namespace RakeRunner.Library.Services
             return true;
         }
         /// <summary>
-        /// 
+        /// Execute a particular rake task in the rake file found in the directory
         /// </summary>
         /// <param name="directory"></param>
         /// <param name="taskName"></param>
+        /// <exception cref="InvalidOperationException">Thrown when rake is not installed</exception>
+        /// <exception cref="RakeFailedException">Thrown when there was an error executing the rake command</exception>
         public void RunRakeTask(string directory, string taskName)
         {
             if (IsRakeInstalled())
@@ -40,20 +43,29 @@ namespace RakeRunner.Library.Services
             }
         }
         /// <summary>
-        /// 
+        /// Get a list of rake tasks for the rake file found in the directory
         /// </summary>
         /// <param name="directory"></param>
         /// <returns></returns>
+        /// <exception cref="InvalidOperationException">Thrown when rake is not installed</exception>
+        /// <exception cref="RakeFailedException">Thrown when there was an error executing the rake command</exception>
         public List<RakeTask> GetRakeTasks(string directory)
         {
             if (IsRakeInstalled())
             {
-                const string RAKE_WORD = "rake";
+                //-P will get the tasks, no description
                 var stringTasks = runRakeProcess(directory, "-P");
+                
+                //an example of the rake task return is "rake build" or "rake version:minor"
+                const string RAKE_WORD = "rake";
+
+                //parsing the strings into list of RakeTask
                 return (from stringTask in stringTasks
+                        //ensure the line starts with the rake keyword
                         where stringTask.StartsWith(RAKE_WORD, true, CultureInfo.InvariantCulture)
                         select new RakeTask
                         {
+                            //the task comes after the rake word and a space
                             Task = stringTask.Substring(RAKE_WORD.Length + 1)
                         }).ToList();
             }
@@ -73,8 +85,8 @@ namespace RakeRunner.Library.Services
         {
             try
             {
-                System.Diagnostics.ProcessStartInfo procStartInfo =
-                    new System.Diagnostics.ProcessStartInfo("cmd", "/c rake " + rakeParam);
+                // "/c" tells the command line program to execute the arguments on process start
+                System.Diagnostics.ProcessStartInfo procStartInfo = new System.Diagnostics.ProcessStartInfo("cmd", "/c rake " + rakeParam);
                 procStartInfo.WorkingDirectory = directory;
                 procStartInfo.RedirectStandardError = true;
                 procStartInfo.RedirectStandardOutput = true;
@@ -95,12 +107,13 @@ namespace RakeRunner.Library.Services
                 }
                 else
                 {
-                    throw new Exception(proc.StandardError.ReadToEnd());
+                    throw new RakeFailedException(proc.StandardError.ReadToEnd());
 
                 }
             }
             catch (Exception objException)
             {
+                //TODO: add logging
                 throw;
             }
         }
