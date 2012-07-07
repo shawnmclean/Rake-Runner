@@ -2,7 +2,7 @@
 // MUST match PkgCmdID.h
 using System;
 
-namespace Company.RakeRunner_VsExtension
+namespace RakeRunner
 {
     static class PkgCmdIDList
     {
@@ -10,6 +10,7 @@ namespace Company.RakeRunner_VsExtension
         public const uint icmdCommandAbout = 0x501;
         public const uint icmdCommandEditRake = 0x502;
 
+        public const uint icmdTasksList = 0x503;
 
     };
 }

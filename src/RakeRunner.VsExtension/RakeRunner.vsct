@@ -51,23 +51,21 @@
           <CommandName>Rake</CommandName>
         </Strings>
       </Menu>
+    
     </Menus>
 
     <!--Buttons section. -->
     <!--This section defines the elements the user can interact with, like a menu command or a button 
         or combo box in a toolbar. -->
     <Buttons>
-      <Button guid="guidRakeRunnerCmdSet" id="icmdCommandEditRake" priority="0x0000" type="Button">
-        <Parent guid="guidRakeRunnerCmdSet" id="igrpRakeCommands"/>
-        <Strings>
-          <ButtonText>Edit Rakefile...</ButtonText>
-        </Strings>
-      </Button>
 
-      <Button guid="guidRakeRunnerCmdSet" id="icmdCommandAbout" priority="0x0001" type="Button">
-        <Parent guid="guidRakeRunnerCmdSet" id="igrpRakeCommands"/>
+      <Button guid="guidRakeRunnerCmdSet" id="icmdTasksList"
+          type="Button" priority="0x0001">
+        <Parent guid="guidRakeRunnerCmdSet" id="igrpRakeCommands" />
+        <CommandFlag>DynamicItemStart</CommandFlag>
         <Strings>
-          <ButtonText>About</ButtonText>
+          <CommandName>icmdTasksList</CommandName>
+          <ButtonText>Rake Tasks Placeholder</ButtonText>
         </Strings>
       </Button>
     </Buttons>
@@ -112,10 +110,11 @@
       <IDSymbol name="icmdCommandRakeMenu" value="0x500" />
       <IDSymbol name="igrpRakeCommands" value="0x301"/>
 
-      <IDSymbol name="igrpRakeTasks" value="0x400"/>
 
       <IDSymbol name="icmdCommandAbout" value="0x501"/>
       <IDSymbol name="icmdCommandEditRake" value="0x502"/>
+         
+      <IDSymbol name="icmdTasksList" value="0x503"/>
 
     </GuidSymbol>
 

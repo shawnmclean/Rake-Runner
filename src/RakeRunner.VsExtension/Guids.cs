@@ -2,7 +2,7 @@
 // MUST match guids.h
 using System;
 
-namespace Company.RakeRunner_VsExtension
+namespace RakeRunner
 {
     static class GuidList
     {
