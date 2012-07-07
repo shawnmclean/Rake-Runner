@@ -133,7 +133,7 @@ namespace RakeRunner
         /// <param name="pHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the project being loaded.</param><param name="fAdded">[in] true if the project is added to the solution after the solution is opened. false if the project is added to the solution while the solution is being opened.</param>
         int IVsSolutionEvents.OnAfterOpenProject(IVsHierarchy pHierarchy, int fAdded)
         {
-            throw new NotImplementedException();
+            return VSConstants.S_OK;
         }
 
         /// <summary>
@@ -145,7 +145,7 @@ namespace RakeRunner
         /// <param name="pHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the project to be closed.</param><param name="fRemoving">[in] true if the project is being removed from the solution before the solution is closed. false if the project is being removed from the solution while the solution is being closed.</param><param name="pfCancel">[out] true if the client vetoed the closing of the project. false if the client approved the closing of the project.</param>
         int IVsSolutionEvents3.OnQueryCloseProject(IVsHierarchy pHierarchy, int fRemoving, ref int pfCancel)
         {
-            throw new NotImplementedException();
+            return VSConstants.S_OK;
         }
 
         /// <summary>
@@ -157,7 +157,7 @@ namespace RakeRunner
         /// <param name="pHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the project being closed.</param><param name="fRemoved">[in] true if the project was removed from the solution before the solution was closed. false if the project was removed from the solution while the solution was being closed.</param>
         int IVsSolutionEvents3.OnBeforeCloseProject(IVsHierarchy pHierarchy, int fRemoved)
         {
-            throw new NotImplementedException();
+            return VSConstants.S_OK;
         }
 
         /// <summary>
@@ -169,7 +169,7 @@ namespace RakeRunner
         /// <param name="pStubHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the placeholder hierarchy for the unloaded project.</param><param name="pRealHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the project that was loaded.</param>
         int IVsSolutionEvents3.OnAfterLoadProject(IVsHierarchy pStubHierarchy, IVsHierarchy pRealHierarchy)
         {
-            throw new NotImplementedException();
+            return VSConstants.S_OK;
         }
 
         /// <summary>
@@ -181,7 +181,7 @@ namespace RakeRunner
         /// <param name="pRealHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the project to be unloaded.</param><param name="pfCancel">[out] true if the client vetoed unloading the project. false if the client approved unloading the project.</param>
         int IVsSolutionEvents3.OnQueryUnloadProject(IVsHierarchy pRealHierarchy, ref int pfCancel)
         {
-            throw new NotImplementedException();
+            return VSConstants.S_OK;
         }
 
         /// <summary>
@@ -193,7 +193,7 @@ namespace RakeRunner
         /// <param name="pRealHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the project that will be unloaded.</param><param name="pStubHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the placeholder hierarchy for the project being unloaded.</param>
         int IVsSolutionEvents3.OnBeforeUnloadProject(IVsHierarchy pRealHierarchy, IVsHierarchy pStubHierarchy)
         {
-            throw new NotImplementedException();
+            return VSConstants.S_OK;
         }
 
         /// <summary>
@@ -205,7 +205,7 @@ namespace RakeRunner
         /// <param name="pUnkReserved">[in] Reserved for future use.</param><param name="fNewSolution">[in] true if the solution is being created. false if the solution was created previously or is being loaded.</param>
         int IVsSolutionEvents3.OnAfterOpenSolution(object pUnkReserved, int fNewSolution)
         {
-            throw new NotImplementedException();
+            return VSConstants.S_OK;
         }
 
         /// <summary>
@@ -217,7 +217,7 @@ namespace RakeRunner
         /// <param name="pUnkReserved">[in] Reserved for future use.</param><param name="pfCancel">[out] true if the client vetoed closing the solution. false if the client approved closing the solution.</param>
         int IVsSolutionEvents3.OnQueryCloseSolution(object pUnkReserved, ref int pfCancel)
         {
-            throw new NotImplementedException();
+            return VSConstants.S_OK;
         }
 
         /// <summary>
@@ -229,7 +229,7 @@ namespace RakeRunner
         /// <param name="pUnkReserved">[in] Reserved for future use.</param>
         int IVsSolutionEvents3.OnBeforeCloseSolution(object pUnkReserved)
         {
-            throw new NotImplementedException();
+            return VSConstants.S_OK;
         }
 
         /// <summary>
@@ -241,7 +241,7 @@ namespace RakeRunner
         /// <param name="pUnkReserved">[in] Reserved for future use.</param>
         int IVsSolutionEvents3.OnAfterCloseSolution(object pUnkReserved)
         {
-            throw new NotImplementedException();
+            return VSConstants.S_OK;
         }
 
         /// <summary>
@@ -253,7 +253,7 @@ namespace RakeRunner
         /// <param name="pUnkReserved">[in] Reserved for future use.</param>
         int IVsSolutionEvents3.OnAfterMergeSolution(object pUnkReserved)
         {
-            throw new NotImplementedException();
+            return VSConstants.S_OK;
         }
 
         /// <summary>
@@ -265,7 +265,7 @@ namespace RakeRunner
         /// <param name="pHierarchy">[in] Pointer to parent project.</param>
         public int OnBeforeOpeningChildren(IVsHierarchy pHierarchy)
         {
-            throw new NotImplementedException();
+            return VSConstants.S_OK;
         }
 
         /// <summary>
@@ -277,7 +277,7 @@ namespace RakeRunner
         /// <param name="pHierarchy">[in] Pointer to parent project.</param>
         public int OnAfterOpeningChildren(IVsHierarchy pHierarchy)
         {
-            throw new NotImplementedException();
+            return VSConstants.S_OK;
         }
 
         /// <summary>
@@ -289,7 +289,7 @@ namespace RakeRunner
         /// <param name="pHierarchy">[in] Pointer to parent project.</param>
         public int OnBeforeClosingChildren(IVsHierarchy pHierarchy)
         {
-            throw new NotImplementedException();
+            return VSConstants.S_OK;
         }
 
         /// <summary>
@@ -301,7 +301,7 @@ namespace RakeRunner
         /// <param name="pHierarchy">[in] Pointer to parent project.</param>
         public int OnAfterClosingChildren(IVsHierarchy pHierarchy)
         {
-            throw new NotImplementedException();
+            return VSConstants.S_OK;
         }
 
         /// <summary>
@@ -313,7 +313,7 @@ namespace RakeRunner
         /// <param name="pHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the project being loaded.</param><param name="fAdded">[in] true if the project is added to the solution after the solution is opened. false if the project is added to the solution while the solution is being opened.</param>
         int IVsSolutionEvents3.OnAfterOpenProject(IVsHierarchy pHierarchy, int fAdded)
         {
-            throw new NotImplementedException();
+            return VSConstants.S_OK;
         }
 
         /// <summary>
@@ -325,7 +325,7 @@ namespace RakeRunner
         /// <param name="pHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the project to be closed.</param><param name="fRemoving">[in] true if the project is being removed from the solution before the solution is closed. false if the project is being removed from the solution while the solution is being closed.</param><param name="pfCancel">[out] true if the client vetoed the closing of the project. false if the client approved the closing of the project.</param>
         int IVsSolutionEvents2.OnQueryCloseProject(IVsHierarchy pHierarchy, int fRemoving, ref int pfCancel)
         {
-            throw new NotImplementedException();
+            return VSConstants.S_OK;
         }
 
         /// <summary>
@@ -337,7 +337,7 @@ namespace RakeRunner
         /// <param name="pHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the project being closed.</param><param name="fRemoved">[in] true if the project was removed from the solution before the solution was closed. false if the project was removed from the solution while the solution was being closed.</param>
         int IVsSolutionEvents2.OnBeforeCloseProject(IVsHierarchy pHierarchy, int fRemoved)
         {
-            throw new NotImplementedException();
+            return VSConstants.S_OK;
         }
 
         /// <summary>
@@ -349,7 +349,7 @@ namespace RakeRunner
         /// <param name="pStubHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the placeholder hierarchy for the unloaded project.</param><param name="pRealHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the project that was loaded.</param>
         int IVsSolutionEvents2.OnAfterLoadProject(IVsHierarchy pStubHierarchy, IVsHierarchy pRealHierarchy)
         {
-            throw new NotImplementedException();
+            return VSConstants.S_OK;
         }
 
         /// <summary>
@@ -361,7 +361,7 @@ namespace RakeRunner
         /// <param name="pRealHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the project to be unloaded.</param><param name="pfCancel">[out] true if the client vetoed unloading the project. false if the client approved unloading the project.</param>
         int IVsSolutionEvents2.OnQueryUnloadProject(IVsHierarchy pRealHierarchy, ref int pfCancel)
         {
-            throw new NotImplementedException();
+            return VSConstants.S_OK;
         }
 
         /// <summary>
@@ -373,7 +373,7 @@ namespace RakeRunner
         /// <param name="pRealHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the project that will be unloaded.</param><param name="pStubHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the placeholder hierarchy for the project being unloaded.</param>
         int IVsSolutionEvents2.OnBeforeUnloadProject(IVsHierarchy pRealHierarchy, IVsHierarchy pStubHierarchy)
         {
-            throw new NotImplementedException();
+            return VSConstants.S_OK;
         }
 
         /// <summary>
@@ -385,7 +385,7 @@ namespace RakeRunner
         /// <param name="pUnkReserved">[in] Reserved for future use.</param><param name="fNewSolution">[in] true if the solution is being created. false if the solution was created previously or is being loaded.</param>
         int IVsSolutionEvents2.OnAfterOpenSolution(object pUnkReserved, int fNewSolution)
         {
-            throw new NotImplementedException();
+            return VSConstants.S_OK;
         }
 
         /// <summary>
@@ -397,7 +397,7 @@ namespace RakeRunner
         /// <param name="pUnkReserved">[in] Reserved for future use.</param><param name="pfCancel">[out] true if the client vetoed closing the solution. false if the client approved closing the solution.</param>
         int IVsSolutionEvents2.OnQueryCloseSolution(object pUnkReserved, ref int pfCancel)
         {
-            throw new NotImplementedException();
+            return VSConstants.S_OK;
         }
 
         /// <summary>
@@ -409,7 +409,7 @@ namespace RakeRunner
         /// <param name="pUnkReserved">[in] Reserved for future use.</param>
         int IVsSolutionEvents2.OnBeforeCloseSolution(object pUnkReserved)
         {
-            throw new NotImplementedException();
+            return VSConstants.S_OK;
         }
 
         /// <summary>
@@ -421,7 +421,7 @@ namespace RakeRunner
         /// <param name="pUnkReserved">[in] Reserved for future use.</param>
         int IVsSolutionEvents2.OnAfterCloseSolution(object pUnkReserved)
         {
-            throw new NotImplementedException();
+            return VSConstants.S_OK;
         }
 
         /// <summary>
@@ -433,7 +433,7 @@ namespace RakeRunner
         /// <param name="pUnkReserved">[in] Reserved for future use.</param>
         int IVsSolutionEvents2.OnAfterMergeSolution(object pUnkReserved)
         {
-            throw new NotImplementedException();
+            return VSConstants.S_OK;
         }
 
         /// <summary>
@@ -445,7 +445,7 @@ namespace RakeRunner
         /// <param name="pHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the project being loaded.</param><param name="fAdded">[in] true if the project is added to the solution after the solution is opened. false if the project is added to the solution while the solution is being opened.</param>
         int IVsSolutionEvents2.OnAfterOpenProject(IVsHierarchy pHierarchy, int fAdded)
         {
-            throw new NotImplementedException();
+            return VSConstants.S_OK;
         }
 
         /// <summary>
@@ -457,7 +457,7 @@ namespace RakeRunner
         /// <param name="pHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the project to be closed.</param><param name="fRemoving">[in] true if the project is being removed from the solution before the solution is closed. false if the project is being removed from the solution while the solution is being closed.</param><param name="pfCancel">[out] true if the client vetoed the closing of the project. false if the client approved the closing of the project.</param>
         int IVsSolutionEvents.OnQueryCloseProject(IVsHierarchy pHierarchy, int fRemoving, ref int pfCancel)
         {
-            throw new NotImplementedException();
+            return VSConstants.S_OK;
         }
 
         /// <summary>
@@ -469,7 +469,7 @@ namespace RakeRunner
         /// <param name="pHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the project being closed.</param><param name="fRemoved">[in] true if the project was removed from the solution before the solution was closed. false if the project was removed from the solution while the solution was being closed.</param>
         int IVsSolutionEvents.OnBeforeCloseProject(IVsHierarchy pHierarchy, int fRemoved)
         {
-            throw new NotImplementedException();
+            return VSConstants.S_OK;
         }
 
         /// <summary>
@@ -481,7 +481,7 @@ namespace RakeRunner
         /// <param name="pStubHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the placeholder hierarchy for the unloaded project.</param><param name="pRealHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the project that was loaded.</param>
         int IVsSolutionEvents.OnAfterLoadProject(IVsHierarchy pStubHierarchy, IVsHierarchy pRealHierarchy)
         {
-            throw new NotImplementedException();
+            return VSConstants.S_OK;
         }
 
         /// <summary>
@@ -493,7 +493,7 @@ namespace RakeRunner
         /// <param name="pRealHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the project to be unloaded.</param><param name="pfCancel">[out] true if the client vetoed unloading the project. false if the client approved unloading the project.</param>
         int IVsSolutionEvents.OnQueryUnloadProject(IVsHierarchy pRealHierarchy, ref int pfCancel)
         {
-            throw new NotImplementedException();
+            return VSConstants.S_OK;
         }
 
         /// <summary>
@@ -505,7 +505,7 @@ namespace RakeRunner
         /// <param name="pRealHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the project that will be unloaded.</param><param name="pStubHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the placeholder hierarchy for the project being unloaded.</param>
         int IVsSolutionEvents.OnBeforeUnloadProject(IVsHierarchy pRealHierarchy, IVsHierarchy pStubHierarchy)
         {
-            throw new NotImplementedException();
+            return VSConstants.S_OK;
         }
 
         /// <summary>
@@ -517,7 +517,7 @@ namespace RakeRunner
         /// <param name="pUnkReserved">[in] Reserved for future use.</param><param name="fNewSolution">[in] true if the solution is being created. false if the solution was created previously or is being loaded.</param>
         int IVsSolutionEvents.OnAfterOpenSolution(object pUnkReserved, int fNewSolution)
         {
-            throw new NotImplementedException();
+            return VSConstants.S_OK;
         }
 
         /// <returns>
@@ -526,7 +526,7 @@ namespace RakeRunner
         /// <param name="pUnkReserved">[in] Reserved for future use.</param><param name="pfCancel">[out] true if the client vetoed closing the solution. false if the client approved closing the solution.</param>
         int IVsSolutionEvents.OnQueryCloseSolution(object pUnkReserved, ref int pfCancel)
         {
-            throw new NotImplementedException();
+            return VSConstants.S_OK;
         }
 
         /// <summary>
@@ -538,7 +538,7 @@ namespace RakeRunner
         /// <param name="pUnkReserved">[in] Reserved for future use.</param>
         int IVsSolutionEvents.OnBeforeCloseSolution(object pUnkReserved)
         {
-            throw new NotImplementedException();
+            return VSConstants.S_OK;
         }
 
         /// <summary>
@@ -550,7 +550,7 @@ namespace RakeRunner
         /// <param name="pUnkReserved">[in] Reserved for future use.</param>
         int IVsSolutionEvents.OnAfterCloseSolution(object pUnkReserved)
         {
-            throw new NotImplementedException();
+            return VSConstants.S_OK;
         }
 
         #endregion
@@ -566,7 +566,7 @@ namespace RakeRunner
         /// <param name="cChanges">[in] Number of files changed.</param><param name="rgpszFile">[in, size_is(cChanges)] Array of file names.</param><param name="rggrfChange">[in, size_is(cChanges)] Array of flags indicating the type of changes. See <see cref="T:Microsoft.VisualStudio.Shell.Interop._VSFILECHANGEFLAGS"/>.</param>
         public int FilesChanged(uint cChanges, string[] rgpszFile, uint[] rggrfChange)
         {
-            throw new NotImplementedException();
+            return VSConstants.S_OK;
         }
 
         /// <summary>
@@ -578,7 +578,7 @@ namespace RakeRunner
         /// <param name="pszDirectory">[in] Name of the directory that had a change.</param>
         public int DirectoryChanged(string pszDirectory)
         {
-            throw new NotImplementedException();
+            return VSConstants.S_OK;
         }
 
         #endregion
