@@ -351,7 +351,21 @@ namespace RakeRunner
         /// <param name="pHierOld">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the project hierarchy for the previous selection.</param><param name="itemidOld">[in] Identifier of the project item for previous selection. For valid <paramref name="itemidOld"/> values, see VSITEMID.</param><param name="pMISOld">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsMultiItemSelect"/> interface to access a previous multiple selection.</param><param name="pSCOld">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.ISelectionContainer"/> interface to access Properties window data for the previous selection.</param><param name="pHierNew">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the project hierarchy for the current selection.</param><param name="itemidNew">[in] Identifier of the project item for the current selection. For valid <paramref name="itemidNew"/> values, see VSITEMID.</param><param name="pMISNew">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsMultiItemSelect"/> interface for the current selection.</param><param name="pSCNew">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.ISelectionContainer"/> interface for the current selection.</param>
         public int OnSelectionChanged(IVsHierarchy pHierOld, uint itemidOld, IVsMultiItemSelect pMISOld, ISelectionContainer pSCOld, IVsHierarchy pHierNew, uint itemidNew, IVsMultiItemSelect pMISNew, ISelectionContainer pSCNew)
         {
-            return VSConstants.S_OK;
+            string fullPath = "";
+            if(pHierNew != null)
+            {   
+                // Get the full path
+                pHierNew.GetCanonicalName(itemidNew, out fullPath);
+            }
+            //if path is null, get it from solution level
+            if (string.IsNullOrEmpty(fullPath))
+            {
+                fullPath = getSolutionFileName();
+            }
+
+            // Setup the rake menu for this path
+
+            return VSConstants.S_OK; 
         }
 
         /// <summary>
