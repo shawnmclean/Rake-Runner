@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.ComponentModel.Design;
 using System.Windows.Forms;
@@ -34,17 +35,19 @@ namespace RakeRunner
     // This attribute is needed to let the shell know that this package exposes some menus.
     [ProvideMenuResource("Menus.ctmenu", 1)]
     // add these 2 Annotations to execute Initialize() immediately when a project is loaded
-    [ProvideAutoLoad(VSConstants.UICONTEXT.SolutionHasSingleProject_string)]
-    [ProvideAutoLoad(VSConstants.UICONTEXT.SolutionHasMultipleProjects_string)]
+    [ProvideAutoLoad(VSConstants.UICONTEXT.SolutionOpening_string)]
+    //[ProvideAutoLoad(VSConstants.UICONTEXT.SolutionHasMultipleProjects_string)]
     [Guid(GuidList.guidRakeRunnerPkgString)]
-    public class RakeRunner : Package,  
+    public class RakeRunner : 
+        Package,
         IVsSolutionEvents3,
         IVsFileChangeEvents,
+        IVsSelectionEvents,
         IDisposable
     {
         private DTE _dte;
         private RakeService rakeService = null;
-        private uint _vsSolutionEventsCookie, _vsIVsFileChangeEventsCookie, _vsIVsUpdateSolutionEventsCookie;
+        private uint _vsSolutionEventsCookie, _vsIVsFileChangeEventsCookie, _vsMonitorCookie;
 
         /// <summary>
         /// Default constructor of the package.
@@ -75,8 +78,12 @@ namespace RakeRunner
 
 
             rakeService = new RakeService();
-
+            
             this._dte = (DTE)this.GetService(typeof(DTE));
+
+            IVsMonitorSelection ms = this.GetService(typeof(SVsShellMonitorSelection)) as IVsMonitorSelection;
+            if (ms != null)
+                ms.AdviseSelectionEvents(this, out _vsMonitorCookie);
 
             var solution = this.GetService(typeof(SVsSolution)) as IVsSolution;
             if (solution != null)
@@ -91,7 +98,7 @@ namespace RakeRunner
                 var menu = new OleMenuCommand(null, command);
                 mcs.AddCommand(menu);
                 
-                
+                //var tasks = rakeService.GetRakeTasks()
             }
         }
 
@@ -124,134 +131,62 @@ namespace RakeRunner
 
         #region Implementation of IVsSolutionEvents
 
-        /// <summary>
-        /// Notifies listening clients that the project has been opened.
-        /// </summary>
-        /// <returns>
-        /// If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK"/>. If it fails, it returns an error code.
-        /// </returns>
-        /// <param name="pHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the project being loaded.</param><param name="fAdded">[in] true if the project is added to the solution after the solution is opened. false if the project is added to the solution while the solution is being opened.</param>
-        int IVsSolutionEvents.OnAfterOpenProject(IVsHierarchy pHierarchy, int fAdded)
+        public int OnAfterOpenSolution([InAttribute] Object pUnkReserved, [InAttribute] int fNewSolution)
+        {
+            monitorFileChange();
+
+            return VSConstants.S_OK;
+        }
+
+        public int OnAfterCloseSolution([InAttribute] Object pUnkReserved)
+        {
+            unmonitorFileChange();
+            return VSConstants.S_OK;
+        }
+
+        public int OnAfterLoadProject([InAttribute] IVsHierarchy pStubHierarchy, [InAttribute] IVsHierarchy pRealHierarchy)
         {
             return VSConstants.S_OK;
         }
 
-        /// <summary>
-        /// Queries listening clients as to whether the project can be closed.
-        /// </summary>
-        /// <returns>
-        /// If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK"/>. If it fails, it returns an error code.
-        /// </returns>
-        /// <param name="pHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the project to be closed.</param><param name="fRemoving">[in] true if the project is being removed from the solution before the solution is closed. false if the project is being removed from the solution while the solution is being closed.</param><param name="pfCancel">[out] true if the client vetoed the closing of the project. false if the client approved the closing of the project.</param>
-        int IVsSolutionEvents3.OnQueryCloseProject(IVsHierarchy pHierarchy, int fRemoving, ref int pfCancel)
+        public int OnAfterOpenProject([InAttribute] IVsHierarchy pHierarchy, [InAttribute] int fAdded)
+        {
+
+            
+            return VSConstants.S_OK;
+        }
+
+        public int OnBeforeCloseProject([InAttribute] IVsHierarchy pHierarchy, [InAttribute] int fRemoved)
         {
             return VSConstants.S_OK;
         }
 
-        /// <summary>
-        /// Notifies listening clients that the project is about to be closed.
-        /// </summary>
-        /// <returns>
-        /// If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK"/>. If it fails, it returns an error code.
-        /// </returns>
-        /// <param name="pHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the project being closed.</param><param name="fRemoved">[in] true if the project was removed from the solution before the solution was closed. false if the project was removed from the solution while the solution was being closed.</param>
-        int IVsSolutionEvents3.OnBeforeCloseProject(IVsHierarchy pHierarchy, int fRemoved)
+        public int OnBeforeCloseSolution([InAttribute] Object pUnkReserved)
         {
             return VSConstants.S_OK;
         }
 
-        /// <summary>
-        /// Notifies listening clients that the project has been loaded.
-        /// </summary>
-        /// <returns>
-        /// If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK"/>. If it fails, it returns an error code.
-        /// </returns>
-        /// <param name="pStubHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the placeholder hierarchy for the unloaded project.</param><param name="pRealHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the project that was loaded.</param>
-        int IVsSolutionEvents3.OnAfterLoadProject(IVsHierarchy pStubHierarchy, IVsHierarchy pRealHierarchy)
+        public int OnBeforeUnloadProject([InAttribute] IVsHierarchy pRealHierarchy, [InAttribute] IVsHierarchy pStubHierarchy)
         {
             return VSConstants.S_OK;
         }
 
-        /// <summary>
-        /// Queries listening clients as to whether the project can be unloaded.
-        /// </summary>
-        /// <returns>
-        /// If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK"/>. If it fails, it returns an error code.
-        /// </returns>
-        /// <param name="pRealHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the project to be unloaded.</param><param name="pfCancel">[out] true if the client vetoed unloading the project. false if the client approved unloading the project.</param>
-        int IVsSolutionEvents3.OnQueryUnloadProject(IVsHierarchy pRealHierarchy, ref int pfCancel)
+        public int OnQueryCloseProject([InAttribute] IVsHierarchy pHierarchy, [InAttribute] int fRemoving, [InAttribute] ref int pfCancel)
         {
             return VSConstants.S_OK;
         }
 
-        /// <summary>
-        /// Notifies listening clients that the project is about to be unloaded.
-        /// </summary>
-        /// <returns>
-        /// If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK"/>. If it fails, it returns an error code.
-        /// </returns>
-        /// <param name="pRealHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the project that will be unloaded.</param><param name="pStubHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the placeholder hierarchy for the project being unloaded.</param>
-        int IVsSolutionEvents3.OnBeforeUnloadProject(IVsHierarchy pRealHierarchy, IVsHierarchy pStubHierarchy)
+        public int OnQueryCloseSolution([InAttribute] Object pUnkReserved, [InAttribute] ref int pfCancel)
         {
             return VSConstants.S_OK;
         }
 
-        /// <summary>
-        /// Notifies listening clients that the solution has been opened.
-        /// </summary>
-        /// <returns>
-        /// If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK"/>. If it fails, it returns an error code.
-        /// </returns>
-        /// <param name="pUnkReserved">[in] Reserved for future use.</param><param name="fNewSolution">[in] true if the solution is being created. false if the solution was created previously or is being loaded.</param>
-        int IVsSolutionEvents3.OnAfterOpenSolution(object pUnkReserved, int fNewSolution)
+        public int OnQueryUnloadProject([InAttribute] IVsHierarchy pRealHierarchy, [InAttribute] ref int pfCancel)
         {
             return VSConstants.S_OK;
         }
 
-        /// <summary>
-        /// Queries listening clients as to whether the solution can be closed.
-        /// </summary>
-        /// <returns>
-        /// If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK"/>. If it fails, it returns an error code.
-        /// </returns>
-        /// <param name="pUnkReserved">[in] Reserved for future use.</param><param name="pfCancel">[out] true if the client vetoed closing the solution. false if the client approved closing the solution.</param>
-        int IVsSolutionEvents3.OnQueryCloseSolution(object pUnkReserved, ref int pfCancel)
-        {
-            return VSConstants.S_OK;
-        }
-
-        /// <summary>
-        /// Notifies listening clients that the solution is about to be closed.
-        /// </summary>
-        /// <returns>
-        /// If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK"/>. If it fails, it returns an error code.
-        /// </returns>
-        /// <param name="pUnkReserved">[in] Reserved for future use.</param>
-        int IVsSolutionEvents3.OnBeforeCloseSolution(object pUnkReserved)
-        {
-            return VSConstants.S_OK;
-        }
-
-        /// <summary>
-        /// Notifies listening clients that a solution has been closed.
-        /// </summary>
-        /// <returns>
-        /// If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK"/>. If it fails, it returns an error code.
-        /// </returns>
-        /// <param name="pUnkReserved">[in] Reserved for future use.</param>
-        int IVsSolutionEvents3.OnAfterCloseSolution(object pUnkReserved)
-        {
-            return VSConstants.S_OK;
-        }
-
-        /// <summary>
-        /// Notifies listening clients that all projects have been merged into the open solution.
-        /// </summary>
-        /// <returns>
-        /// If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK"/>. If it fails, it returns an error code.
-        /// </returns>
-        /// <param name="pUnkReserved">[in] Reserved for future use.</param>
-        int IVsSolutionEvents3.OnAfterMergeSolution(object pUnkReserved)
+        public int OnAfterMergeSolution([InAttribute] Object pUnkReserved)
         {
             return VSConstants.S_OK;
         }
@@ -304,258 +239,31 @@ namespace RakeRunner
             return VSConstants.S_OK;
         }
 
-        /// <summary>
-        /// Notifies listening clients that the project has been opened.
-        /// </summary>
-        /// <returns>
-        /// If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK"/>. If it fails, it returns an error code.
-        /// </returns>
-        /// <param name="pHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the project being loaded.</param><param name="fAdded">[in] true if the project is added to the solution after the solution is opened. false if the project is added to the solution while the solution is being opened.</param>
-        int IVsSolutionEvents3.OnAfterOpenProject(IVsHierarchy pHierarchy, int fAdded)
-        {
-            return VSConstants.S_OK;
-        }
+        #endregion
+
+        #region Implementation of IDisposable
 
         /// <summary>
-        /// Queries listening clients as to whether the project can be closed.
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
-        /// <returns>
-        /// If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK"/>. If it fails, it returns an error code.
-        /// </returns>
-        /// <param name="pHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the project to be closed.</param><param name="fRemoving">[in] true if the project is being removed from the solution before the solution is closed. false if the project is being removed from the solution while the solution is being closed.</param><param name="pfCancel">[out] true if the client vetoed the closing of the project. false if the client approved the closing of the project.</param>
-        int IVsSolutionEvents2.OnQueryCloseProject(IVsHierarchy pHierarchy, int fRemoving, ref int pfCancel)
+        /// <filterpriority>2</filterpriority>
+        public void Dispose()
         {
-            return VSConstants.S_OK;
-        }
-
-        /// <summary>
-        /// Notifies listening clients that the project is about to be closed.
-        /// </summary>
-        /// <returns>
-        /// If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK"/>. If it fails, it returns an error code.
-        /// </returns>
-        /// <param name="pHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the project being closed.</param><param name="fRemoved">[in] true if the project was removed from the solution before the solution was closed. false if the project was removed from the solution while the solution was being closed.</param>
-        int IVsSolutionEvents2.OnBeforeCloseProject(IVsHierarchy pHierarchy, int fRemoved)
-        {
-            return VSConstants.S_OK;
-        }
-
-        /// <summary>
-        /// Notifies listening clients that the project has been loaded.
-        /// </summary>
-        /// <returns>
-        /// If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK"/>. If it fails, it returns an error code.
-        /// </returns>
-        /// <param name="pStubHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the placeholder hierarchy for the unloaded project.</param><param name="pRealHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the project that was loaded.</param>
-        int IVsSolutionEvents2.OnAfterLoadProject(IVsHierarchy pStubHierarchy, IVsHierarchy pRealHierarchy)
-        {
-            return VSConstants.S_OK;
-        }
-
-        /// <summary>
-        /// Queries listening clients as to whether the project can be unloaded.
-        /// </summary>
-        /// <returns>
-        /// If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK"/>. If it fails, it returns an error code.
-        /// </returns>
-        /// <param name="pRealHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the project to be unloaded.</param><param name="pfCancel">[out] true if the client vetoed unloading the project. false if the client approved unloading the project.</param>
-        int IVsSolutionEvents2.OnQueryUnloadProject(IVsHierarchy pRealHierarchy, ref int pfCancel)
-        {
-            return VSConstants.S_OK;
-        }
-
-        /// <summary>
-        /// Notifies listening clients that the project is about to be unloaded.
-        /// </summary>
-        /// <returns>
-        /// If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK"/>. If it fails, it returns an error code.
-        /// </returns>
-        /// <param name="pRealHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the project that will be unloaded.</param><param name="pStubHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the placeholder hierarchy for the project being unloaded.</param>
-        int IVsSolutionEvents2.OnBeforeUnloadProject(IVsHierarchy pRealHierarchy, IVsHierarchy pStubHierarchy)
-        {
-            return VSConstants.S_OK;
-        }
-
-        /// <summary>
-        /// Notifies listening clients that the solution has been opened.
-        /// </summary>
-        /// <returns>
-        /// If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK"/>. If it fails, it returns an error code.
-        /// </returns>
-        /// <param name="pUnkReserved">[in] Reserved for future use.</param><param name="fNewSolution">[in] true if the solution is being created. false if the solution was created previously or is being loaded.</param>
-        int IVsSolutionEvents2.OnAfterOpenSolution(object pUnkReserved, int fNewSolution)
-        {
-            return VSConstants.S_OK;
-        }
-
-        /// <summary>
-        /// Queries listening clients as to whether the solution can be closed.
-        /// </summary>
-        /// <returns>
-        /// If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK"/>. If it fails, it returns an error code.
-        /// </returns>
-        /// <param name="pUnkReserved">[in] Reserved for future use.</param><param name="pfCancel">[out] true if the client vetoed closing the solution. false if the client approved closing the solution.</param>
-        int IVsSolutionEvents2.OnQueryCloseSolution(object pUnkReserved, ref int pfCancel)
-        {
-            return VSConstants.S_OK;
-        }
-
-        /// <summary>
-        /// Notifies listening clients that the solution is about to be closed.
-        /// </summary>
-        /// <returns>
-        /// If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK"/>. If it fails, it returns an error code.
-        /// </returns>
-        /// <param name="pUnkReserved">[in] Reserved for future use.</param>
-        int IVsSolutionEvents2.OnBeforeCloseSolution(object pUnkReserved)
-        {
-            return VSConstants.S_OK;
-        }
-
-        /// <summary>
-        /// Notifies listening clients that a solution has been closed.
-        /// </summary>
-        /// <returns>
-        /// If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK"/>. If it fails, it returns an error code.
-        /// </returns>
-        /// <param name="pUnkReserved">[in] Reserved for future use.</param>
-        int IVsSolutionEvents2.OnAfterCloseSolution(object pUnkReserved)
-        {
-            return VSConstants.S_OK;
-        }
-
-        /// <summary>
-        /// Notifies listening clients that all projects have been merged into the open solution.
-        /// </summary>
-        /// <returns>
-        /// If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK"/>. If it fails, it returns an error code.
-        /// </returns>
-        /// <param name="pUnkReserved">[in] Reserved for future use.</param>
-        int IVsSolutionEvents2.OnAfterMergeSolution(object pUnkReserved)
-        {
-            return VSConstants.S_OK;
-        }
-
-        /// <summary>
-        /// Notifies listening clients that the project has been opened.
-        /// </summary>
-        /// <returns>
-        /// If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK"/>. If it fails, it returns an error code.
-        /// </returns>
-        /// <param name="pHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the project being loaded.</param><param name="fAdded">[in] true if the project is added to the solution after the solution is opened. false if the project is added to the solution while the solution is being opened.</param>
-        int IVsSolutionEvents2.OnAfterOpenProject(IVsHierarchy pHierarchy, int fAdded)
-        {
-            return VSConstants.S_OK;
-        }
-
-        /// <summary>
-        /// Queries listening clients as to whether the project can be closed.
-        /// </summary>
-        /// <returns>
-        /// If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK"/>. If it fails, it returns an error code.
-        /// </returns>
-        /// <param name="pHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the project to be closed.</param><param name="fRemoving">[in] true if the project is being removed from the solution before the solution is closed. false if the project is being removed from the solution while the solution is being closed.</param><param name="pfCancel">[out] true if the client vetoed the closing of the project. false if the client approved the closing of the project.</param>
-        int IVsSolutionEvents.OnQueryCloseProject(IVsHierarchy pHierarchy, int fRemoving, ref int pfCancel)
-        {
-            return VSConstants.S_OK;
-        }
-
-        /// <summary>
-        /// Notifies listening clients that the project is about to be closed.
-        /// </summary>
-        /// <returns>
-        /// If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK"/>. If it fails, it returns an error code.
-        /// </returns>
-        /// <param name="pHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the project being closed.</param><param name="fRemoved">[in] true if the project was removed from the solution before the solution was closed. false if the project was removed from the solution while the solution was being closed.</param>
-        int IVsSolutionEvents.OnBeforeCloseProject(IVsHierarchy pHierarchy, int fRemoved)
-        {
-            return VSConstants.S_OK;
-        }
-
-        /// <summary>
-        /// Notifies listening clients that the project has been loaded.
-        /// </summary>
-        /// <returns>
-        /// If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK"/>. If it fails, it returns an error code.
-        /// </returns>
-        /// <param name="pStubHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the placeholder hierarchy for the unloaded project.</param><param name="pRealHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the project that was loaded.</param>
-        int IVsSolutionEvents.OnAfterLoadProject(IVsHierarchy pStubHierarchy, IVsHierarchy pRealHierarchy)
-        {
-            return VSConstants.S_OK;
-        }
-
-        /// <summary>
-        /// Queries listening clients as to whether the project can be unloaded.
-        /// </summary>
-        /// <returns>
-        /// If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK"/>. If it fails, it returns an error code.
-        /// </returns>
-        /// <param name="pRealHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the project to be unloaded.</param><param name="pfCancel">[out] true if the client vetoed unloading the project. false if the client approved unloading the project.</param>
-        int IVsSolutionEvents.OnQueryUnloadProject(IVsHierarchy pRealHierarchy, ref int pfCancel)
-        {
-            return VSConstants.S_OK;
-        }
-
-        /// <summary>
-        /// Notifies listening clients that the project is about to be unloaded.
-        /// </summary>
-        /// <returns>
-        /// If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK"/>. If it fails, it returns an error code.
-        /// </returns>
-        /// <param name="pRealHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the project that will be unloaded.</param><param name="pStubHierarchy">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the placeholder hierarchy for the project being unloaded.</param>
-        int IVsSolutionEvents.OnBeforeUnloadProject(IVsHierarchy pRealHierarchy, IVsHierarchy pStubHierarchy)
-        {
-            return VSConstants.S_OK;
-        }
-
-        /// <summary>
-        /// Notifies listening clients that the solution has been opened.
-        /// </summary>
-        /// <returns>
-        /// If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK"/>. If it fails, it returns an error code.
-        /// </returns>
-        /// <param name="pUnkReserved">[in] Reserved for future use.</param><param name="fNewSolution">[in] true if the solution is being created. false if the solution was created previously or is being loaded.</param>
-        int IVsSolutionEvents.OnAfterOpenSolution(object pUnkReserved, int fNewSolution)
-        {
-            return VSConstants.S_OK;
-        }
-
-        /// <returns>
-        /// If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK"/>. If it fails, it returns an error code.
-        /// </returns>
-        /// <param name="pUnkReserved">[in] Reserved for future use.</param><param name="pfCancel">[out] true if the client vetoed closing the solution. false if the client approved closing the solution.</param>
-        int IVsSolutionEvents.OnQueryCloseSolution(object pUnkReserved, ref int pfCancel)
-        {
-            return VSConstants.S_OK;
-        }
-
-        /// <summary>
-        /// Notifies listening clients that the solution is about to be closed.
-        /// </summary>
-        /// <returns>
-        /// If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK"/>. If it fails, it returns an error code.
-        /// </returns>
-        /// <param name="pUnkReserved">[in] Reserved for future use.</param>
-        int IVsSolutionEvents.OnBeforeCloseSolution(object pUnkReserved)
-        {
-            return VSConstants.S_OK;
-        }
-
-        /// <summary>
-        /// Notifies listening clients that a solution has been closed.
-        /// </summary>
-        /// <returns>
-        /// If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK"/>. If it fails, it returns an error code.
-        /// </returns>
-        /// <param name="pUnkReserved">[in] Reserved for future use.</param>
-        int IVsSolutionEvents.OnAfterCloseSolution(object pUnkReserved)
-        {
-            return VSConstants.S_OK;
+            // Unregister from receiving solution events
+            if (VSConstants.VSCOOKIE_NIL != _vsSolutionEventsCookie)
+            {
+                IVsSolution sol = this.GetService(typeof(SVsSolution)) as IVsSolution;
+                if (sol != null)
+                {
+                    sol.UnadviseSolutionEvents(_vsSolutionEventsCookie);
+                    _vsSolutionEventsCookie = VSConstants.VSCOOKIE_NIL;
+                }
+            }
         }
 
         #endregion
 
-        #region Implementation of IVsFileChangeEvents
+        #region Files and Directories
 
         /// <summary>
         /// Notifies clients of changes made to one or more files.
@@ -581,26 +289,93 @@ namespace RakeRunner
             return VSConstants.S_OK;
         }
 
-        #endregion
 
-        #region Implementation of IDisposable
+        private void monitorFileChange()
+        {
+            var solutionFileName = getSolutionFileName();
+
+            if (!string.IsNullOrEmpty(solutionFileName))
+            {
+                var monitorFolder = Path.GetDirectoryName(solutionFileName);
+
+                IVsFileChangeEx fileChangeService = this.GetService(typeof (SVsFileChangeEx)) as IVsFileChangeEx;
+                if (VSConstants.VSCOOKIE_NIL != _vsIVsFileChangeEventsCookie)
+                {
+                    fileChangeService.UnadviseFileChange(_vsIVsFileChangeEventsCookie);
+                }
+                fileChangeService.AdviseFileChange(monitorFolder, 1, this, out _vsIVsFileChangeEventsCookie);
+                Debug.WriteLine("==== Monitoring: " + monitorFolder + " " + _vsIVsFileChangeEventsCookie);
+
+            }
+        }
+
+        private void unmonitorFileChange()
+        {
+            if (VSConstants.VSCOOKIE_NIL != _vsIVsFileChangeEventsCookie)
+            {
+                IVsFileChangeEx fileChangeService = this.GetService(typeof(SVsFileChangeEx)) as IVsFileChangeEx;
+                fileChangeService.UnadviseDirChange(_vsIVsFileChangeEventsCookie);
+                Debug.WriteLine("==== Stop Monitoring: " + _vsIVsFileChangeEventsCookie.ToString());
+                _vsIVsFileChangeEventsCookie = VSConstants.VSCOOKIE_NIL;
+            }
+        }
 
         /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// Returns the filename of the solution
         /// </summary>
-        /// <filterpriority>2</filterpriority>
-        public void Dispose()
+        private string getSolutionFileName()
         {
-            // Unregister from receiving solution events
-            if (VSConstants.VSCOOKIE_NIL != _vsSolutionEventsCookie)
+            IVsSolution sol = (IVsSolution)this.GetService(typeof(SVsSolution));
+            
+            string solutionDirectory, solutionFile, solutionUserOptions;
+            if (sol.GetSolutionInfo(out solutionDirectory, out solutionFile, out solutionUserOptions) == VSConstants.S_OK)
             {
-                IVsSolution sol = this.GetService(typeof(SVsSolution)) as IVsSolution;
-                if (sol != null)
-                {
-                    sol.UnadviseSolutionEvents(_vsSolutionEventsCookie);
-                    _vsSolutionEventsCookie = VSConstants.VSCOOKIE_NIL;
-                }
+                return solutionFile;
             }
+            else
+            {
+                return null;
+            }
+        }
+        #endregion
+
+
+        #region Implementation of IVsSelectionEvents
+
+        /// <summary>
+        /// Reports that the project hierarchy, item and/or selection container has changed.
+        /// </summary>
+        /// <returns>
+        /// If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK"/>. If it fails, it returns an error code.
+        /// </returns>
+        /// <param name="pHierOld">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the project hierarchy for the previous selection.</param><param name="itemidOld">[in] Identifier of the project item for previous selection. For valid <paramref name="itemidOld"/> values, see VSITEMID.</param><param name="pMISOld">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsMultiItemSelect"/> interface to access a previous multiple selection.</param><param name="pSCOld">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.ISelectionContainer"/> interface to access Properties window data for the previous selection.</param><param name="pHierNew">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> interface of the project hierarchy for the current selection.</param><param name="itemidNew">[in] Identifier of the project item for the current selection. For valid <paramref name="itemidNew"/> values, see VSITEMID.</param><param name="pMISNew">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsMultiItemSelect"/> interface for the current selection.</param><param name="pSCNew">[in] Pointer to the <see cref="T:Microsoft.VisualStudio.Shell.Interop.ISelectionContainer"/> interface for the current selection.</param>
+        public int OnSelectionChanged(IVsHierarchy pHierOld, uint itemidOld, IVsMultiItemSelect pMISOld, ISelectionContainer pSCOld, IVsHierarchy pHierNew, uint itemidNew, IVsMultiItemSelect pMISNew, ISelectionContainer pSCNew)
+        {
+            return VSConstants.S_OK;
+        }
+
+        /// <summary>
+        /// Reports that an element value has changed.
+        /// </summary>
+        /// <returns>
+        /// If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK"/>. If it fails, it returns an error code.
+        /// </returns>
+        /// <param name="elementid">[in] DWORD value representing a particular entry in the array of element values associated with the selection context. For valid <paramref name="elementid"/> values, see <see cref="T:Microsoft.VisualStudio.VSConstants.VSSELELEMID"/>.</param><param name="varValueOld">[in] VARIANT that contains the previous element value. This parameter contains element-specific data, such as a pointer to the <see cref="T:Microsoft.VisualStudio.OLE.Interop.IOleCommandTarget"/> interface if <paramref name="elementid"/> is set to SEID_ResultsList or a pointer to the <see cref="T:Microsoft.VisualStudio.OLE.Interop.IOleUndoManager"/> interface if <paramref name="elementid"/> is set to SEID_UndoManager.</param><param name="varValueNew">[in] VARIANT that contains the new element value. This parameter contains element-specific data, such as a pointer to the IOleCommandTarget interface if <paramref name="elementid"/> is set to SEID_ResultsList or a pointer to the IOleUndoManager interface if <paramref name="elementid"/> is set to SEID_UndoManager.</param>
+        public int OnElementValueChanged(uint elementid, object varValueOld, object varValueNew)
+        {
+            return VSConstants.S_OK;
+        }
+
+        /// <summary>
+        /// Reports that the command UI context has changed.
+        /// </summary>
+        /// <returns>
+        /// If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK"/>. If it fails, it returns an error code.
+        /// </returns>
+        /// <param name="dwCmdUICookie">[in] DWORD representation of the GUID identifying the command UI context passed in as the <paramref name="rguidCmdUI"/> parameter in the call to <see cref="M:Microsoft.VisualStudio.Shell.Interop.IVsMonitorSelection.GetCmdUIContextCookie(System.Guid@,System.UInt32@)"/>.</param><param name="fActive">[in] Flag that is set to true if the command UI context identified by <paramref name="dwCmdUICookie"/> has become active and false if it has become inactive.</param>
+        public int OnCmdUIContextChanged(uint dwCmdUICookie, int fActive)
+        {
+            return VSConstants.S_OK;
         }
 
         #endregion
