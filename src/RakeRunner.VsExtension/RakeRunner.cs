@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -12,6 +13,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using RakeRunner.Library.Exceptions;
+using RakeRunner.Library.Models;
 using RakeRunner.Library.Services;
 
 namespace RakeRunner
@@ -98,49 +100,23 @@ namespace RakeRunner
                 var menu = new OleMenuCommand(null, command);
                 mcs.AddCommand(menu);
                 
-                //var tasks = rakeService.GetRakeTasks()
             }
         }
 
         #endregion
 
-        /// <summary>
-        /// This function is the callback used to execute a command when the a menu item is clicked.
-        /// See the Initialize method to see how the menu item is associated to this function using
-        /// the OleMenuCommandService service and the MenuCommand class.
-        /// </summary>
-        private void MenuItemCallback(object sender, EventArgs e)
-        {
-            // Show a Message Box to prove we were here
-            IVsUIShell uiShell = (IVsUIShell)GetService(typeof(SVsUIShell));
-            Guid clsid = Guid.Empty;
-            int result;
-            Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(uiShell.ShowMessageBox(
-                       0,
-                       ref clsid,
-                       "Rake Runner",
-                       string.Format(CultureInfo.CurrentCulture, "Inside {0}.MenuItemCallback()", this.ToString()),
-                       string.Empty,
-                       0,
-                       OLEMSGBUTTON.OLEMSGBUTTON_OK,
-                       OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST,
-                       OLEMSGICON.OLEMSGICON_INFO,
-                       0,        // false
-                       out result));
-        }
+
 
         #region Implementation of IVsSolutionEvents
 
         public int OnAfterOpenSolution([InAttribute] Object pUnkReserved, [InAttribute] int fNewSolution)
         {
-            monitorFileChange();
 
             return VSConstants.S_OK;
         }
 
         public int OnAfterCloseSolution([InAttribute] Object pUnkReserved)
         {
-            unmonitorFileChange();
             return VSConstants.S_OK;
         }
 
@@ -290,35 +266,35 @@ namespace RakeRunner
         }
 
 
-        private void monitorFileChange()
-        {
-            var solutionFileName = getSolutionFileName();
+        //private void monitorFileChange()
+        //{
+        //    var solutionFileName = getSolutionFileName();
 
-            if (!string.IsNullOrEmpty(solutionFileName))
-            {
-                var monitorFolder = Path.GetDirectoryName(solutionFileName);
+        //    if (!string.IsNullOrEmpty(solutionFileName))
+        //    {
+        //        var monitorFolder = Path.GetDirectoryName(solutionFileName);
 
-                IVsFileChangeEx fileChangeService = this.GetService(typeof (SVsFileChangeEx)) as IVsFileChangeEx;
-                if (VSConstants.VSCOOKIE_NIL != _vsIVsFileChangeEventsCookie)
-                {
-                    fileChangeService.UnadviseFileChange(_vsIVsFileChangeEventsCookie);
-                }
-                fileChangeService.AdviseFileChange(monitorFolder, 1, this, out _vsIVsFileChangeEventsCookie);
-                Debug.WriteLine("==== Monitoring: " + monitorFolder + " " + _vsIVsFileChangeEventsCookie);
+        //        IVsFileChangeEx fileChangeService = this.GetService(typeof (SVsFileChangeEx)) as IVsFileChangeEx;
+        //        if (VSConstants.VSCOOKIE_NIL != _vsIVsFileChangeEventsCookie)
+        //        {
+        //            fileChangeService.UnadviseFileChange(_vsIVsFileChangeEventsCookie);
+        //        }
+        //        fileChangeService.AdviseFileChange(monitorFolder, 1, this, out _vsIVsFileChangeEventsCookie);
+        //        Debug.WriteLine("==== Monitoring: " + monitorFolder + " " + _vsIVsFileChangeEventsCookie);
 
-            }
-        }
+        //    }
+        //}
 
-        private void unmonitorFileChange()
-        {
-            if (VSConstants.VSCOOKIE_NIL != _vsIVsFileChangeEventsCookie)
-            {
-                IVsFileChangeEx fileChangeService = this.GetService(typeof(SVsFileChangeEx)) as IVsFileChangeEx;
-                fileChangeService.UnadviseDirChange(_vsIVsFileChangeEventsCookie);
-                Debug.WriteLine("==== Stop Monitoring: " + _vsIVsFileChangeEventsCookie.ToString());
-                _vsIVsFileChangeEventsCookie = VSConstants.VSCOOKIE_NIL;
-            }
-        }
+        //private void unmonitorFileChange()
+        //{
+        //    if (VSConstants.VSCOOKIE_NIL != _vsIVsFileChangeEventsCookie)
+        //    {
+        //        IVsFileChangeEx fileChangeService = this.GetService(typeof(SVsFileChangeEx)) as IVsFileChangeEx;
+        //        fileChangeService.UnadviseDirChange(_vsIVsFileChangeEventsCookie);
+        //        Debug.WriteLine("==== Stop Monitoring: " + _vsIVsFileChangeEventsCookie.ToString());
+        //        _vsIVsFileChangeEventsCookie = VSConstants.VSCOOKIE_NIL;
+        //    }
+        //}
 
         /// <summary>
         /// Returns the filename of the solution
@@ -362,9 +338,9 @@ namespace RakeRunner
             {
                 fullPath = getSolutionFileName();
             }
-
+            var directory = Path.GetDirectoryName(fullPath);
             // Setup the rake menu for this path
-
+            setupRakeTasksMenu(directory);
             return VSConstants.S_OK; 
         }
 
@@ -390,6 +366,98 @@ namespace RakeRunner
         public int OnCmdUIContextChanged(uint dwCmdUICookie, int fActive)
         {
             return VSConstants.S_OK;
+        }
+
+        #endregion
+
+        #region Custom Code
+
+        private Dictionary<string, List<RakeTask>>  taskCache = new Dictionary<string, List<RakeTask>>();
+        private List<int> currentCommandsInMenu = new List<int>();
+
+        private void updateCache(string dir)
+        {
+            try
+            {
+                //get the tasks
+                var tasks = rakeService.GetRakeTasks(dir);
+
+                //check if the cache exist then replace it or add it
+                if (taskCache.ContainsKey(dir))
+                {
+                    taskCache[dir] = tasks;
+                }
+                else
+                {
+                    taskCache.Add(dir, tasks);
+                }
+            }
+            catch
+            {
+                
+            }
+
+        }
+
+        private void setupRakeTasksMenu(string dir)
+        {
+            try
+            {
+                List<RakeTask> tasks;
+                //update if cache not exist
+                if(!taskCache.ContainsKey(dir))
+                {
+                    updateCache(dir);
+                }
+                //get the tasks from the cache for the directory
+                taskCache.TryGetValue(dir, out tasks);
+
+                OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
+               
+
+                // Add our command handlers for menu (commands must exist in the .vsct file)
+                if (null != mcs)
+                {
+                    //if there is any task in menu, remove them all.
+                    foreach (var command in currentCommandsInMenu)
+                    {
+                        var cmdID = new CommandID(
+                        GuidList.guidRakeRunnerCmdSet, command);
+                        var menu = mcs.FindCommand(cmdID);
+                        if (menu != null)
+                            mcs.RemoveCommand(menu);
+                        
+                    }
+                    //clear the commands list
+                    currentCommandsInMenu.Clear();
+
+                    if (tasks != null)
+                    {
+                        //add the tasks
+                        for (int i = 0; i < tasks.Count; i++)
+                        {
+                            int commandId = (int) PkgCmdIDList.icmdTasksList + i;
+                            var cmdID = new CommandID(
+                                GuidList.guidRakeRunnerCmdSet, commandId);
+                            var mc = new OleMenuCommand(RakeTaskSelected, cmdID);
+                            mc.Text = tasks[i].Task;
+                            mcs.AddCommand(mc);
+                            //store the commandid so we can remove when re-creating the menu
+                            currentCommandsInMenu.Add(commandId);
+                        }
+                    }
+                    //var tasks = rakeService.GetRakeTasks()
+                }
+            }
+            catch
+            {
+                
+            }
+        }
+
+        private void RakeTaskSelected(object sender, EventArgs eventArgs)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion
