@@ -31,11 +31,11 @@ namespace RakeRunner.Library.Services
         /// <param name="taskName"></param>
         /// <exception cref="InvalidOperationException">Thrown when rake is not installed</exception>
         /// <exception cref="RakeFailedException">Thrown when there was an error executing the rake command</exception>
-        public void RunRakeTask(string directory, string taskName)
+        public List<string> RunRakeTask(string directory, string taskName)
         {
             if (IsRakeInstalled())
             {
-                runRakeProcess(directory, taskName);
+                return runRakeProcess(directory, taskName);
             }
             else
             {
