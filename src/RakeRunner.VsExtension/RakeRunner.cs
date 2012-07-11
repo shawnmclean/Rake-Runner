@@ -342,6 +342,8 @@ namespace RakeRunner
                 fullPath = getSolutionFileName();
             }
             var directory = Path.GetDirectoryName(fullPath);
+            //set the current dir var so we can use it in other parts of the service
+            currentDir = directory;
             // Setup the rake menu for this path
             setupRakeTasksMenu(directory);
             return VSConstants.S_OK; 
@@ -377,7 +379,8 @@ namespace RakeRunner
 
         private Dictionary<string, List<RakeTask>>  taskCache = new Dictionary<string, List<RakeTask>>();
         private List<int> currentCommandsInMenu = new List<int>();
-        private List<RakeTask> currentTasks = new List<RakeTask>(); 
+        private string currentDir = "";
+
         private void updateCache(string dir)
         {
             try
@@ -433,7 +436,6 @@ namespace RakeRunner
                     }
                     //clear the commands list
                     currentCommandsInMenu.Clear();
-                    currentTasks.Clear();
 
                     if (tasks != null)
                     {
@@ -448,7 +450,6 @@ namespace RakeRunner
                             mcs.AddCommand(mc);
                             //store the commandid so we can remove when re-creating the menu
                             currentCommandsInMenu.Add(commandId);
-                            currentTasks.Add(tasks[i]);
                         }
                     }
                     //var tasks = rakeService.GetRakeTasks()
@@ -466,16 +467,47 @@ namespace RakeRunner
             if (null != menuCommand)
             {
                 int taskIndex = menuCommand.CommandID.ID - (int)PkgCmdIDList.icmdTasksList;
-                if (taskIndex >= 0 && taskIndex < currentTasks.Count)
+
+                if (taskIndex >= 0 && taskIndex < taskCache[currentDir].Count)
                 {
-                    var selection = this.currentTasks[taskIndex];
+                    var selection = taskCache[currentDir][taskIndex];
+                    
                     System.Windows.Forms.MessageBox.Show(
                         string.Format(CultureInfo.CurrentCulture,
                                       "Selected {0}", selection.Task));
+                    runRakeTask(selection, currentDir);
                 }
             }
         }
 
+        private void runRakeTask(RakeTask task, string dir)
+        {
+            rakeService.RunRakeTask(dir, task.Task);
+        }
+
+        private void WriteOutputWindow(string outputText)
+        {
+            IVsOutputWindow outputWindow = Package.GetGlobalService(typeof(SVsOutputWindow)) as IVsOutputWindow;
+
+            // If we fail to get it we can exit now. 
+            if (null == outputWindow)
+            {
+                Trace.WriteLine("Failed to get a reference to IVsOutputWindow");
+                return;
+            }
+            // Now get the window pane for the general output. 
+            Guid guidGeneral = Microsoft.VisualStudio.VSConstants.GUID_OutWindowGeneralPane;
+            IVsOutputWindowPane windowPane = null;
+            if (Microsoft.VisualStudio.ErrorHandler.Failed(outputWindow.GetPane(ref guidGeneral, out windowPane)))
+            {
+                Trace.WriteLine("Failed to get a reference to the Output window General pane");
+                return;
+            }
+            if (Microsoft.VisualStudio.ErrorHandler.Failed(windowPane.OutputString(outputText)))
+            {
+                Trace.WriteLine("Failed to write on the Output window");
+            }
+        } 
         #endregion
     }
 }
