@@ -91,6 +91,7 @@ namespace RakeRunner
             if (solution != null)
                 solution.AdviseSolutionEvents(this, out _vsSolutionEventsCookie);
 
+
             // Add our command handlers for menu (commands must exist in the .vsct file)
             OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
             if ( null != mcs )
@@ -111,7 +112,7 @@ namespace RakeRunner
 
         public int OnAfterOpenSolution([InAttribute] Object pUnkReserved, [InAttribute] int fNewSolution)
         {
-
+            monitorFileChange();
             return VSConstants.S_OK;
         }
 
@@ -225,6 +226,8 @@ namespace RakeRunner
         /// <filterpriority>2</filterpriority>
         public void Dispose()
         {
+            unmonitorFileChange();
+
             // Unregister from receiving solution events
             if (VSConstants.VSCOOKIE_NIL != _vsSolutionEventsCookie)
             {
@@ -266,35 +269,35 @@ namespace RakeRunner
         }
 
 
-        //private void monitorFileChange()
-        //{
-        //    var solutionFileName = getSolutionFileName();
+        private void monitorFileChange()
+        {
+            var solutionFileName = getSolutionFileName();
 
-        //    if (!string.IsNullOrEmpty(solutionFileName))
-        //    {
-        //        var monitorFolder = Path.GetDirectoryName(solutionFileName);
+            if (!string.IsNullOrEmpty(solutionFileName))
+            {
+                var monitorFolder = Path.GetDirectoryName(solutionFileName);
 
-        //        IVsFileChangeEx fileChangeService = this.GetService(typeof (SVsFileChangeEx)) as IVsFileChangeEx;
-        //        if (VSConstants.VSCOOKIE_NIL != _vsIVsFileChangeEventsCookie)
-        //        {
-        //            fileChangeService.UnadviseFileChange(_vsIVsFileChangeEventsCookie);
-        //        }
-        //        fileChangeService.AdviseFileChange(monitorFolder, 1, this, out _vsIVsFileChangeEventsCookie);
-        //        Debug.WriteLine("==== Monitoring: " + monitorFolder + " " + _vsIVsFileChangeEventsCookie);
+                IVsFileChangeEx fileChangeService = this.GetService(typeof(SVsFileChangeEx)) as IVsFileChangeEx;
+                if (VSConstants.VSCOOKIE_NIL != _vsIVsFileChangeEventsCookie)
+                {
+                    fileChangeService.UnadviseFileChange(_vsIVsFileChangeEventsCookie);
+                }
+                fileChangeService.AdviseFileChange(monitorFolder, 1, this, out _vsIVsFileChangeEventsCookie);
+                Debug.WriteLine("==== Monitoring: " + monitorFolder + " " + _vsIVsFileChangeEventsCookie);
 
-        //    }
-        //}
+            }
+        }
 
-        //private void unmonitorFileChange()
-        //{
-        //    if (VSConstants.VSCOOKIE_NIL != _vsIVsFileChangeEventsCookie)
-        //    {
-        //        IVsFileChangeEx fileChangeService = this.GetService(typeof(SVsFileChangeEx)) as IVsFileChangeEx;
-        //        fileChangeService.UnadviseDirChange(_vsIVsFileChangeEventsCookie);
-        //        Debug.WriteLine("==== Stop Monitoring: " + _vsIVsFileChangeEventsCookie.ToString());
-        //        _vsIVsFileChangeEventsCookie = VSConstants.VSCOOKIE_NIL;
-        //    }
-        //}
+        private void unmonitorFileChange()
+        {
+            if (VSConstants.VSCOOKIE_NIL != _vsIVsFileChangeEventsCookie)
+            {
+                IVsFileChangeEx fileChangeService = this.GetService(typeof(SVsFileChangeEx)) as IVsFileChangeEx;
+                fileChangeService.UnadviseDirChange(_vsIVsFileChangeEventsCookie);
+                Debug.WriteLine("==== Stop Monitoring: " + _vsIVsFileChangeEventsCookie.ToString());
+                _vsIVsFileChangeEventsCookie = VSConstants.VSCOOKIE_NIL;
+            }
+        }
 
         /// <summary>
         /// Returns the filename of the solution
@@ -374,7 +377,7 @@ namespace RakeRunner
 
         private Dictionary<string, List<RakeTask>>  taskCache = new Dictionary<string, List<RakeTask>>();
         private List<int> currentCommandsInMenu = new List<int>();
-
+        private List<RakeTask> currentTasks = new List<RakeTask>(); 
         private void updateCache(string dir)
         {
             try
@@ -430,6 +433,7 @@ namespace RakeRunner
                     }
                     //clear the commands list
                     currentCommandsInMenu.Clear();
+                    currentTasks.Clear();
 
                     if (tasks != null)
                     {
@@ -444,6 +448,7 @@ namespace RakeRunner
                             mcs.AddCommand(mc);
                             //store the commandid so we can remove when re-creating the menu
                             currentCommandsInMenu.Add(commandId);
+                            currentTasks.Add(tasks[i]);
                         }
                     }
                     //var tasks = rakeService.GetRakeTasks()
@@ -457,7 +462,18 @@ namespace RakeRunner
 
         private void RakeTaskSelected(object sender, EventArgs eventArgs)
         {
-            throw new NotImplementedException();
+            var menuCommand = sender as OleMenuCommand;
+            if (null != menuCommand)
+            {
+                int taskIndex = menuCommand.CommandID.ID - (int)PkgCmdIDList.icmdTasksList;
+                if (taskIndex >= 0 && taskIndex < currentTasks.Count)
+                {
+                    var selection = this.currentTasks[taskIndex];
+                    System.Windows.Forms.MessageBox.Show(
+                        string.Format(CultureInfo.CurrentCulture,
+                                      "Selected {0}", selection.Task));
+                }
+            }
         }
 
         #endregion
