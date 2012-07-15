@@ -1,17 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="250f7ad3-190d-489e-b8f9-9a0604c2ac72" Version="0.0.0.1" Language="en-US" Publisher="Shawn Mclean" />
+    <Identity Id="250f7ad3-190d-489e-b8f9-9a0604c2ac72" Version="0.0.0.2" Language="en-US" Publisher="Shawn Mclean" />
     <DisplayName>Rake Runner</DisplayName>
-    <Description>Rake runner tool for visual studio that integrates with the solution explorer.</Description>
+    <Description>Rake tool that lists and execute rake tasks within the visual studio solution explorer context menu.</Description>
     <MoreInfo>http://www.shawnmclean.com/blog/2012/07/rake-runner-a-visual-studio-extension-for-rake-tasks/</MoreInfo>
     <License>LICENSE.txt</License>
-    <ReleaseNotes>release-notes.txt</ReleaseNotes>
     <PreviewImage>PreviewImage.png</PreviewImage>
     <Tags>rake, ruby</Tags>
   </Metadata>
   <Installation InstalledByMsi="false">
     <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="11.0" />
+    <InstallationTarget Version="[11.0,12.0)" Id="Microsoft.VisualStudio.IntegratedShell" />
+    <InstallationTarget Version="[11.0,12.0)" Id="Microsoft.VisualStudio.VSWinExpress" />
   </Installation>
   <Dependencies>
     <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="4.5" />
