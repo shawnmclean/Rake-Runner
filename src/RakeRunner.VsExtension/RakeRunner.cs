@@ -90,9 +90,25 @@ namespace RakeRunner
             {
                 //the main menu
                 CommandID command = new CommandID(GuidList.guidRakeRunnerCmdSet, (int)PkgCmdIDList.icmdCommandRakeMenu);
-                var menu = new OleMenuCommand(null, command);
-                mcs.AddCommand(menu);
+                var cmd = new OleMenuCommand(null, command);
+                cmd.BeforeQueryStatus += cmd_BeforeQueryStatus;
+                mcs.AddCommand(cmd);
+
+                //the main menu
+                command = new CommandID(GuidList.guidRakeRunnerCmdSet, (int)PkgCmdIDList.icmdRefresh);
+                cmd = new OleMenuCommand(RefreshCommand, command);
+                mcs.AddCommand(cmd);
             }
+        }
+
+        void cmd_BeforeQueryStatus(object sender, EventArgs e)
+        {
+            setupRakeTasksMenu(currentDir);
+        }
+
+        private void RefreshCommand(object sender, EventArgs eventArgs)
+        {
+            deleteCache();
         }
 
         #endregion Package Members
@@ -274,7 +290,7 @@ namespace RakeRunner
             //set the current dir var so we can use it in other parts of the service
             currentDir = directory;
             // Setup the rake menu for this path
-            setupRakeTasksMenu(directory);
+            //setupRakeTasksMenu(directory);
             return VSConstants.S_OK;
         }
 
@@ -306,7 +322,13 @@ namespace RakeRunner
 
         #region Custom Code
 
+        /// <summary>
+        /// Cache of tasks by directory
+        /// </summary>
         private Dictionary<string, List<RakeTask>> taskCache = new Dictionary<string, List<RakeTask>>();
+        /// <summary>
+        /// List of commandid currently in the rake menu
+        /// </summary>
         private List<int> currentCommandsInMenu = new List<int>();
         private string currentDir = "";
 
@@ -331,7 +353,14 @@ namespace RakeRunner
             {
             }
         }
-
+        private void deleteCache()
+        {
+            taskCache.Clear();
+        }
+        /// <summary>
+        /// create the list of tasks and replace the placeholder menu
+        /// </summary>
+        /// <param name="dir"></param>
         private void setupRakeTasksMenu(string dir)
         {
             try

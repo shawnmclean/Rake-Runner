@@ -38,7 +38,10 @@
          group as the part of a menu contained between two lines. The parent of a group 
          must be a menu. -->
     <Groups>
-      <Group guid="guidRakeRunnerCmdSet" id="igrpRakeCommands" priority="0x0000">
+      <Group guid="guidRakeRunnerCmdSet" id="igrpRakeSetting" priority="0x0000">
+        <Parent guid="guidRakeRunnerCmdSet" id="icmdCommandRakeMenu"/>
+      </Group>
+      <Group guid="guidRakeRunnerCmdSet" id="igrpRakeCommands" priority="0x0001">
         <Parent guid="guidRakeRunnerCmdSet" id="icmdCommandRakeMenu"/>
       </Group>
     </Groups>
@@ -59,13 +62,22 @@
         or combo box in a toolbar. -->
     <Buttons>
 
+      <Button guid="guidRakeRunnerCmdSet" id="icmdRefresh"
+    type="Button" priority="0x0001">
+        <Parent guid="guidRakeRunnerCmdSet" id="igrpRakeSetting" />
+        <Strings>
+          <CommandName>icmdRefresh</CommandName>
+          <ButtonText>Refresh</ButtonText>
+        </Strings>
+      </Button>
+      
       <Button guid="guidRakeRunnerCmdSet" id="icmdTasksList"
-          type="Button" priority="0x0001">
+          type="Button" priority="0x0002">
         <Parent guid="guidRakeRunnerCmdSet" id="igrpRakeCommands" />
         <CommandFlag>DynamicItemStart</CommandFlag>
         <Strings>
           <CommandName>icmdTasksList</CommandName>
-          <ButtonText>Rake Tasks Placeholder</ButtonText>
+          <ButtonText></ButtonText>
         </Strings>
       </Button>
     </Buttons>
@@ -107,15 +119,14 @@
     <!-- This is the guid used to group the menu commands together -->
     <GuidSymbol name="guidRakeRunnerCmdSet" value="{c78d067c-81eb-42ee-b3c6-5ad5ebec72ae}">
 
-      <IDSymbol name="icmdCommandRakeMenu" value="0x500" />
-      <IDSymbol name="igrpRakeCommands" value="0x301"/>
+      <IDSymbol name="icmdCommandRakeMenu" value="0x300" />
 
-
-      <IDSymbol name="icmdCommandAbout" value="0x501"/>
-      <IDSymbol name="icmdCommandEditRake" value="0x502"/>
-         
-      <IDSymbol name="icmdTasksList" value="0x503"/>
-
+      <IDSymbol name="igrpRakeSetting" value="0x400"/>
+      <IDSymbol name="icmdRefresh" value="0x401"/>
+      
+      <IDSymbol name="igrpRakeCommands" value="0x500"/>   
+      <IDSymbol name="icmdTasksList" value="0x501"/>
+      
     </GuidSymbol>
 
 
