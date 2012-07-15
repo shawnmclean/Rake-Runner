@@ -6,6 +6,7 @@
     <Description>Rake tool that lists and execute rake tasks within the visual studio solution explorer context menu.</Description>
     <MoreInfo>http://www.shawnmclean.com/blog/2012/07/rake-runner-a-visual-studio-extension-for-rake-tasks/</MoreInfo>
     <License>LICENSE.txt</License>
+    <ReleaseNotes>release-notes.txt</ReleaseNotes>
     <PreviewImage>PreviewImage.png</PreviewImage>
     <Tags>rake, ruby</Tags>
   </Metadata>
