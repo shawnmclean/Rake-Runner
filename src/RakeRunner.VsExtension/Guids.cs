@@ -4,7 +4,7 @@ using System;
 
 namespace RakeRunner
 {
-    static class GuidList
+    internal static class GuidList
     {
         public const string guidRakeRunnerPkgString = "250f7ad3-190d-489e-b8f9-9a0604c2ac72";
 

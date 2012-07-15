@@ -2,21 +2,26 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using RakeRunner.Library.Exceptions;
 using RakeRunner.Library.Models;
 
 namespace RakeRunner.Library.Services
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class RakeService
     {
         /// <summary>
-        /// 
+        /// callback for whenever the rake process fires an event
+        /// </summary>
+        private Action<string> rakeOutputCallback;
+
+        private Action<string> rakeErrorOutputCallback;
+
+        /// <summary>
+        ///
         /// </summary>
         /// <returns></returns>
         public bool IsRakeInstalled()
@@ -24,6 +29,7 @@ namespace RakeRunner.Library.Services
             //TODO: Need to know how to check if rake is installed.
             return true;
         }
+
         /// <summary>
         /// Execute a particular rake task in the rake file found in the directory
         /// </summary>
@@ -31,17 +37,26 @@ namespace RakeRunner.Library.Services
         /// <param name="taskName"></param>
         /// <exception cref="InvalidOperationException">Thrown when rake is not installed</exception>
         /// <exception cref="RakeFailedException">Thrown when there was an error executing the rake command</exception>
-        public List<string> RunRakeTask(string directory, string taskName)
+        public void RunRakeTask(string directory, string taskName, Action<string> outputCallback, Action<string> errorCallback)
         {
             if (IsRakeInstalled())
             {
-                return runRakeProcess(directory, taskName);
+                //set the callback
+                rakeOutputCallback = outputCallback;
+                rakeErrorOutputCallback = errorCallback;
+
+                runRakeProcess(directory, taskName, true);
+
+                //remove the callback after task is finished
+                rakeOutputCallback = null;
+                rakeErrorOutputCallback = null;
             }
             else
             {
                 throw new InvalidOperationException("Rake is not installed.");
             }
         }
+
         /// <summary>
         /// Get a list of rake tasks for the rake file found in the directory
         /// </summary>
@@ -54,8 +69,8 @@ namespace RakeRunner.Library.Services
             if (IsRakeInstalled())
             {
                 //-P will get the tasks, no description
-                var stringTasks = runRakeProcess(directory, "-P");
-                
+                var stringTasks = runRakeProcess(directory, "-P", false);
+
                 //an example of the rake task return is "rake build" or "rake version:minor"
                 const string RAKE_WORD = "rake";
 
@@ -73,15 +88,15 @@ namespace RakeRunner.Library.Services
             {
                 throw new InvalidOperationException("Rake is not installed.");
             }
-
         }
+
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="directory"></param>
         /// <param name="rakeParam"></param>
         /// <returns></returns>
-        private List<string> runRakeProcess(string directory, string rakeParam)
+        private List<string> runRakeProcess(string directory, string rakeParam, bool useCallbacks)
         {
             try
             {
@@ -91,14 +106,25 @@ namespace RakeRunner.Library.Services
                 procStartInfo.RedirectStandardError = true;
                 procStartInfo.RedirectStandardOutput = true;
                 procStartInfo.UseShellExecute = false;
+
                 // Do not create the black window.
                 procStartInfo.CreateNoWindow = true;
                 // Now we create a process, assign its ProcessStartInfo and start it
-                System.Diagnostics.Process proc = new System.Diagnostics.Process();
-                proc.StartInfo = procStartInfo;
+                System.Diagnostics.Process proc = System.Diagnostics.Process.Start(procStartInfo);
+                if (useCallbacks)
+                {
+                    //event for when data is recieved
+                    proc.OutputDataReceived += proc_OutputDataReceived;
+                    proc.ErrorDataReceived += proc_ErrorDataReceived;
 
-                proc.Start();
+                    proc.BeginErrorReadLine();
+                    proc.BeginOutputReadLine();
+                }
+                //proc.Start();
                 proc.WaitForExit();
+
+                if (useCallbacks)
+                    return null;
 
                 if (proc.ExitCode == 0)
                 {
@@ -108,7 +134,6 @@ namespace RakeRunner.Library.Services
                 else
                 {
                     throw new RakeFailedException(proc.StandardError.ReadToEnd());
-
                 }
             }
             catch (Exception objException)
@@ -118,5 +143,20 @@ namespace RakeRunner.Library.Services
             }
         }
 
+        private void proc_ErrorDataReceived(object sender, System.Diagnostics.DataReceivedEventArgs e)
+        {
+            if (rakeErrorOutputCallback != null)
+            {
+                rakeErrorOutputCallback(e.Data);
+            }
+        }
+
+        private void proc_OutputDataReceived(object sender, System.Diagnostics.DataReceivedEventArgs e)
+        {
+            if (rakeOutputCallback != null)
+            {
+                rakeOutputCallback(e.Data);
+            }
+        }
     }
 }
