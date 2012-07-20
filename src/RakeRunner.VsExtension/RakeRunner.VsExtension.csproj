@@ -53,13 +53,17 @@
     <Reference Include="Microsoft.VisualStudio.Shell.11.0" />
     <Reference Include="Microsoft.VisualStudio.Shell.Immutable.10.0" />
     <Reference Include="Microsoft.VisualStudio.Shell.Immutable.11.0" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Design" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="EnvDTE">
@@ -119,6 +123,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Guids.cs" />
+    <Compile Include="Options\OptionPage.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Options\OptionsControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Options\OptionsControl.Designer.cs">
+      <DependentUpon>OptionsControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -130,6 +143,9 @@
     <Compile Include="PkgCmdID.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Options\OptionsControl.resx">
+      <DependentUpon>OptionsControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

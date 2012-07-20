@@ -11,6 +11,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using RakeRunner.Library.Models;
 using RakeRunner.Library.Services;
+using RakeRunner.VsExtension;
 
 namespace RakeRunner
 {
@@ -36,7 +37,9 @@ namespace RakeRunner
     [ProvideAutoLoad(VSConstants.UICONTEXT.SolutionOpening_string)]
     //[ProvideAutoLoad(VSConstants.UICONTEXT.SolutionHasMultipleProjects_string)]
     [Guid(GuidList.guidRakeRunnerPkgString)]
-    public class RakeRunner :
+    [ProvideOptionPage(typeof(OptionPage),
+    "Rake Runner", "General", 0, 0, true)]
+    public sealed class RakeRunner :
         Package,
         IVsSolutionEvents3,
         IVsSelectionEvents,
