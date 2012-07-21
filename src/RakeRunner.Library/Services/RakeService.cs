@@ -194,8 +194,9 @@ namespace RakeRunner.Library.Services
         {
             foreach (string path in (Environment.GetEnvironmentVariable("PATH") ?? "").Split(';'))
             {
-                if (!String.IsNullOrEmpty(path) && File.Exists(Path.Combine(path, file)))
-                    return Path.GetFullPath(path);
+                var combinedPath = "";
+                if (!String.IsNullOrEmpty(path) && File.Exists(combinedPath = Path.Combine(path, file)))
+                    return Path.GetFullPath(combinedPath);
             }
             throw new FileNotFoundException(new FileNotFoundException().Message, file);
         }
