@@ -12,9 +12,19 @@ namespace RakeRunner.VsExtension
 {
     [ClassInterface(ClassInterfaceType.AutoDual)]
     [Guid("1D9ECCF3-5D2F-4112-9B25-264596873DC9")]
-    public class OptionPage : DialogPage
+    public class OptionPage : DialogPage, INotifyPropertyChanged
     {
-        public string RakePath { get; set; }
+        private string rakePath ;
+
+        public string RakePath
+        {
+            get { return rakePath; }
+            set
+            {
+                rakePath = value;
+                OnPropertyChanged("RakePath");
+            }
+        }
 
         [Browsable(false)]
         [DesignerSerializationVisibility(
@@ -28,6 +38,14 @@ namespace RakeRunner.VsExtension
                 page.Initialize();
                 return page;
             }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

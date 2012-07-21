@@ -74,8 +74,30 @@ namespace RakeRunner
         {
             Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
             base.Initialize();
-
+            
             rakeService = new RakeService();
+
+            //get the path of rake from options.
+            string rakePath = "";
+            var optionPage = GetDialogPage(typeof(OptionPage)) as OptionPage;
+            if(optionPage!=null)
+            {
+                //set it in the service
+                rakeService.RakeDefaultPath = rakePath =optionPage.RakePath;
+                //setup property changed event
+                optionPage.PropertyChanged += optionPage_PropertyChanged;
+            }
+            //if the path is empty or null, see if we can find it in the Environment PATH
+            if(string.IsNullOrEmpty(rakePath))
+            {
+                rakePath = rakeService.GetRakePathFromEnvironment();
+                //if found, we set it in the options and the service
+                rakeService.RakeDefaultPath = rakePath;
+                if(optionPage != null)
+                {
+                    optionPage.RakePath = rakePath;
+                }
+            }
 
             this._dte = (DTE)this.GetService(typeof(DTE));
 
@@ -101,6 +123,15 @@ namespace RakeRunner
                 command = new CommandID(GuidList.guidRakeRunnerCmdSet, (int)PkgCmdIDList.icmdRefresh);
                 cmd = new OleMenuCommand(RefreshCommand, command);
                 mcs.AddCommand(cmd);
+            }
+        }
+
+        void optionPage_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            //if the property is rakepath, then update rake service
+            if(e.PropertyName == "RakePath")
+            {
+                rakeService.RakeDefaultPath = ((OptionPage) sender).RakePath;
             }
         }
 

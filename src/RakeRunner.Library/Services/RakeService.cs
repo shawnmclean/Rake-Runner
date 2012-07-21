@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using RakeRunner.Library.Exceptions;
@@ -13,6 +14,13 @@ namespace RakeRunner.Library.Services
     /// </summary>
     public class RakeService
     {
+        public RakeService(string rakeDefaultPath = "")
+        {
+            RakeDefaultPath = rakeDefaultPath;
+        }
+
+
+        public string RakeDefaultPath { get; set; }
         /// <summary>
         /// callback for whenever the rake process fires an event
         /// </summary>
@@ -26,8 +34,14 @@ namespace RakeRunner.Library.Services
         /// <returns></returns>
         public bool IsRakeInstalled()
         {
-            //TODO: Need to know how to check if rake is installed.
-            return true;
+            //check if rake is installed in the folder
+            return File.Exists(RakeDefaultPath);
+            
+        }
+
+        public string GetRakePathFromEnvironment()
+        {
+            return "";
         }
 
         /// <summary>
