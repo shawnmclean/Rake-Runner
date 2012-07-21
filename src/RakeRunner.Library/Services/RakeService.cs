@@ -41,7 +41,14 @@ namespace RakeRunner.Library.Services
 
         public string GetRakePathFromEnvironment()
         {
-            return "";
+            try
+            {
+                return findInEnvironmentPath("rake.bat");
+            }
+            catch (FileNotFoundException fnfex)
+            {
+                return "";
+            }
         }
 
         /// <summary>
@@ -176,6 +183,21 @@ namespace RakeRunner.Library.Services
             {
                 rakeOutputCallback(e.Data);
             }
+        }
+
+        /// <summary>
+        /// Gets full path of a file if found in the evironment PATH
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        private string findInEnvironmentPath(string file)
+        {
+            foreach (string path in (Environment.GetEnvironmentVariable("PATH") ?? "").Split(';'))
+            {
+                if (!String.IsNullOrEmpty(path) && File.Exists(Path.Combine(path, file)))
+                    return Path.GetFullPath(path);
+            }
+            throw new FileNotFoundException(new FileNotFoundException().Message, file);
         }
     }
 }
