@@ -18,9 +18,22 @@ namespace RakeRunner.VsExtension
             InitializeComponent();
         }
 
+        public void Initialize()
+        {
+            Txt_RakePath.Text = OptionPage.RakePath;
+        }
+
         private void btn_BrowseRakeFile_Click(object sender, EventArgs e)
         {
+            if (FileDiag_RakePath.ShowDialog() == DialogResult.OK)
+            {
+                Txt_RakePath.Text = FileDiag_RakePath.FileName;
+            }
+        }
 
+        private void Txt_RakePath_TextChanged(object sender, EventArgs e)
+        {
+            OptionPage.RakePath = Txt_RakePath.Text;
         }
     }
 }

@@ -28,17 +28,19 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.Txt_RakePath = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.btn_BrowseRakeFile = new System.Windows.Forms.Button();
+            this.FileDiag_RakePath = new System.Windows.Forms.OpenFileDialog();
             this.SuspendLayout();
             // 
-            // textBox1
+            // Txt_RakePath
             // 
-            this.textBox1.Location = new System.Drawing.Point(6, 27);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(230, 20);
-            this.textBox1.TabIndex = 0;
+            this.Txt_RakePath.Location = new System.Drawing.Point(6, 27);
+            this.Txt_RakePath.Name = "Txt_RakePath";
+            this.Txt_RakePath.Size = new System.Drawing.Size(230, 20);
+            this.Txt_RakePath.TabIndex = 0;
+            this.Txt_RakePath.TextChanged += new System.EventHandler(this.Txt_RakePath_TextChanged);
             // 
             // label1
             // 
@@ -59,13 +61,17 @@
             this.btn_BrowseRakeFile.UseVisualStyleBackColor = true;
             this.btn_BrowseRakeFile.Click += new System.EventHandler(this.btn_BrowseRakeFile_Click);
             // 
+            // FileDiag_RakePath
+            // 
+            this.FileDiag_RakePath.FileName = "rake.bat";
+            // 
             // OptionsControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.btn_BrowseRakeFile);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.Txt_RakePath);
             this.Name = "OptionsControl";
             this.Size = new System.Drawing.Size(602, 414);
             this.ResumeLayout(false);
@@ -75,8 +81,9 @@
 
         #endregion
 
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox Txt_RakePath;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button btn_BrowseRakeFile;
+        private System.Windows.Forms.OpenFileDialog FileDiag_RakePath;
     }
 }

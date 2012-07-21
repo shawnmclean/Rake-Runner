@@ -14,13 +14,7 @@ namespace RakeRunner.VsExtension
     [Guid("1D9ECCF3-5D2F-4112-9B25-264596873DC9")]
     public class OptionPage : DialogPage
     {
-        private string optionValue = "alpha";
-
-        public string OptionString
-        {
-            get { return optionValue; }
-            set { optionValue = value; }
-        }
+        public string RakePath { get; set; }
 
         [Browsable(false)]
         [DesignerSerializationVisibility(
@@ -31,6 +25,7 @@ namespace RakeRunner.VsExtension
             {
                 OptionsControl page = new OptionsControl();
                 page.OptionPage = this;
+                page.Initialize();
                 return page;
             }
         }
