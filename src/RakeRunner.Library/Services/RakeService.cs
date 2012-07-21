@@ -114,7 +114,7 @@ namespace RakeRunner.Library.Services
             try
             {
                 // "/c" tells the command line program to execute the arguments on process start
-                System.Diagnostics.ProcessStartInfo procStartInfo = new System.Diagnostics.ProcessStartInfo("cmd", "/c rake " + rakeParam);
+                System.Diagnostics.ProcessStartInfo procStartInfo = new System.Diagnostics.ProcessStartInfo("cmd", string.Format("/c {0} {1}", RakeDefaultPath, rakeParam));
                 procStartInfo.WorkingDirectory = directory;
                 procStartInfo.RedirectStandardError = true;
                 procStartInfo.RedirectStandardOutput = true;
