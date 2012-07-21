@@ -1,0 +1,9 @@
+Change log
+
+0.0.0.3 - July 21, 2012
+	- Ensures rake is installed by using path set in options.
+	- Falls back to using the path from the system's Environment PATH.
+
+0.0.0.2 - July 15, 2012
+	- Tasks are listed synchronously.
+	- Tasks are executed asynchronously.
