@@ -472,10 +472,10 @@ namespace RakeRunner
         private void writeOutputWindow(string outputText)
         {
             var windowPane = getOutputWindow();
-            windowPane.Activate();
             //add newline at end of text.
             outputText += "\n";
             windowPane.OutputString(outputText);
+            windowPane.Activate();
         }
 
         private void clearOutputWindow()
